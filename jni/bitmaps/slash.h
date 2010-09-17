@@ -1,0 +1,5 @@
+#define slash_width 3
+#define slash_height 7
+static unsigned char slash_bits[] = {
+   0x04, 0x04, 0x02, 0x02, 0x02, 0x01, 0x01};
+

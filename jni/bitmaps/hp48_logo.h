@@ -1,0 +1,5 @@
+#define hp48_logo_width 13
+#define hp48_logo_height 4
+static unsigned char hp48_logo_bits[] = {
+   0x00, 0x00, 0x00, 0x00, 0xf8, 0x1f, 0xf8, 0x1f};
+

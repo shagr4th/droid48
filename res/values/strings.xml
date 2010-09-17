@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="app_name">Droid48</string>
+<string name="load_prog">Put program on stack</string>
+<string name="save_state">Save memory/state</string>
+<string name="rom_legal">This emulator need a ROM to run. HP-ROM files are copyrighted by Hewlett Packard. But since fall 2000 HP ACO allowed the non commercial use of the HP48 ROM\'s even if you\'re not an owner of this calculator type. This download button will download and install the rom from the hpcalc.org site.</string>
+<string name="button_download">Download and install ROM from HPcalc.org</string>
+<string name="button_quit">Quit</string>
+<string name="reset_memory">Reset memory and quit</string>
+<string name="help">Help</string>
+<string name="ok">Ok</string>
+<string name="prog_ok">The program/object has been put on the stack.\nNow, some HP knowledge is necessary:\n\n- if this is a library, push 0, then STO and shut down (right shift + on) / restart (on) the calculator: the program will be available in the Library (shift right + 2) menu.\n\n- If this is a regular object (dir, external, etc.), push a name between quotes on the stack (for example, \'prog\'), then push STO: the prog will be available in the VAR menu</string>
+<string name="prog_ko">This program cannot be loaded.\nMake sure it\'s a valid one and you have enough memory to load it</string>
+<string name="rom_ko">Rom files not found! This shouldn\'t happen :\\. Quitting now...</string>
+<string name="general_preferences">General settings</string>
+<string name="choose_contrast">Contrast</string>
+<string name="choose_contrast_value">Select the contrast</string>
+<string name="choose_backkey">Back key behavior</string>
+<string name="choose_backkey_value">Choose the action when back is pressed</string>
+<string name="choose_msgbox">No program popup</string>
+<string name="choose_msgbox_value">No message box after loading</string>
+<string name="settings">Settings</string>
+<string name="ramcards_preferences">For advanced users: Ports settings</string>
+<string name="port1_install">Port1 setting</string>
+<string name="port2_install">Port2 setting</string>
+<string name="ram_install">Choose an installation option</string>
+<string name="ram_install_error">The ram cards cannot be install on internal memory</string>
+<string name="ram_install_warning">You need to quit this program to enable your ram cards.\nWARNING: you will experience an HP shutdown on the first restart ! Don\'t panic, it\'s normal, just press the "ON" button on the HP interface.\nYou might want to save the memory after this.</string>
+<string-array name="port_1_values"><item>0</item><item>128</item></string-array>
+<string-array name="port_1_entries"><item>None/Delete</item><item>128kB</item></string-array>
+<string-array name="port_2_values"><item>0</item><item>128</item><item>256</item><item>512</item><item>1024</item><item>4096</item></string-array>
+<string-array name="port_2_entries"><item>None/Delete</item><item>128kB</item><item>256kB</item><item>512kB</item><item>1MB</item><item>4MB</item></string-array>
+<string-array name="contrast_values"><item>0</item><item>1</item><item>2</item></string-array>
+<string-array name="contrast_entries"><item>Original HP</item><item>Default</item><item>Lighter</item></string-array>
+<string-array name="backkey_values"><item>0</item><item>1</item><item>2</item></string-array>
+<string-array name="backkey_entries"><item>Quit program</item><item>Drop button</item><item>ON button (cancel)</item></string-array>
+<string name="saveonexit_msgbox">Save on exit</string>
+<string name="open_numpad">Show/hide numpad</string>
+
+<string name="numpad_explain">You can also tap the LCD screen, more convenient !</string>
+<string name="saveonexit_msgbox_value">Save memory and stack on exit</string>
+<string name="haptic_feedback">Enable Haptic Feedback</string>
+</resources>

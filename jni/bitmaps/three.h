@@ -1,0 +1,5 @@
+#define three_width 5
+#define three_height 7
+static unsigned char three_bits[] = {
+   0x0e, 0x11, 0x10, 0x0c, 0x10, 0x11, 0x0e};
+

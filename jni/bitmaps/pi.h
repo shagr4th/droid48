@@ -1,0 +1,5 @@
+#define pi_width 6
+#define pi_height 7
+static unsigned char pi_bits[] = {
+   0x20, 0x1f, 0x12, 0x12, 0x12, 0x12, 0x12};
+

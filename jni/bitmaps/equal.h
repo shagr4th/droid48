@@ -1,0 +1,5 @@
+#define equal_width 5
+#define equal_height 7
+static unsigned char equal_bits[] = {
+   0x00, 0x1f, 0x00, 0x00, 0x1f, 0x00, 0x00};
+

@@ -1,0 +1,5 @@
+#define lbracket_width 3
+#define lbracket_height 7
+static unsigned char lbracket_bits[] = {
+   0x07, 0x01, 0x01, 0x01, 0x01, 0x01, 0x07};
+

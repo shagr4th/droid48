@@ -1,0 +1,5 @@
+#define rcurly_width 5
+#define rcurly_height 7
+static unsigned char rcurly_bits[] = {
+   0x03, 0x04, 0x04, 0x08, 0x04, 0x04, 0x03};
+

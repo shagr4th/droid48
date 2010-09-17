@@ -1,0 +1,5 @@
+#define integral_width 5
+#define integral_height 8
+static unsigned char integral_bits[] = {
+   0x0c, 0x12, 0x02, 0x04, 0x04, 0x08, 0x09, 0x06};
+

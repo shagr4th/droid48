@@ -1,0 +1,5 @@
+#define two_width 5
+#define two_height 7
+static unsigned char two_bits[] = {
+   0x0e, 0x11, 0x10, 0x08, 0x04, 0x02, 0x1f};
+

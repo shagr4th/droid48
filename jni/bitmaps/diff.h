@@ -1,0 +1,5 @@
+#define diff_width 5
+#define diff_height 7
+static unsigned char diff_bits[] = {
+   0x0e, 0x10, 0x10, 0x1e, 0x11, 0x11, 0x0e};
+
