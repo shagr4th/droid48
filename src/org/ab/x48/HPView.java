@@ -33,41 +33,18 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	private X48 x48;
 	private Bitmap mainScreen;
 	private SurfaceHolder mSurfaceHolder;
-	//private Bitmap  mBackgroundImage;
-	//private Bitmap  mBackgroundImageLand;
-	//private Bitmap  mTouchImage;
 	private Bitmap  annImages [];
 	boolean ann [];
 	int ann_pos [] = { 62, 105, 152, 197, 244, 287 };
 	private List<Integer> queuedCodes;
 	private boolean touches [] = new boolean [MAX_TOUCHES];
-	//private int touches_x [] = new int [MAX_TOUCHES];
-	//private int touches_y [] = new int [MAX_TOUCHES];
 	
 	private short buf [];
 	private int currentOrientation;
 	
-	//private float scaleX = 1.0f;
-	//private float scaleY = 1.0f;
-	
 	int buttons_coords [][] = new int [MAX_TOUCHES][4];
     int icons_coords [][] = new int [6][2];
-    /*int screen_coord [] = new int[2];
-    float screen_factor_x = 1;
-    float back_factor_x = 1;
-
-    float screen_factor_y = 1;
-    float back_factor_y = 1;
-
-    int buttons_coords_land [][] = new int [MAX_TOUCHES][4];
-    int icons_coords_land [][] = new int [6][2];
-    int screen_coord_land [] = new int[2];
-    float screen_factor_land_x = 1;
-    float back_factor_land_x = 1;
-    
-    float screen_factor_land_y = 1;
-    float back_factor_land_y = 1;*/
-    
+   
     Matrix matrixScreen;
     Matrix matrixBack;
     Paint paint;
@@ -106,247 +83,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 
         
 	}
-	/*
-	private void initGraphicsElements() {
-		
-        
-        icons_coords = new int [][] { { 62, 0 }, {105, 0}, {152, 0}, {197, 0}, {244, 0}, {287, 0} };
-        screen_coord = new int [] { 46-15, 1 };
-        screen_factor_x = 1;
-        screen_factor_y = 1;
-        back_factor_x = 1;
-        back_factor_y = 1;
-        buttons_coords = new int [][] {
-            {15, 139, 83, 170},
-            {83, 139, 129, 170},
-            {129, 139, 175, 170},
-            {175, 139, 221, 170},
-            {221, 139, 267, 170},
-            {267, 139, 1000, 170},
-            {15, 170, 83, 206},
-            {83, 170, 129, 206},
-            {129, 170, 175, 206},
-            {175, 170, 221, 206},
-            {221, 170, 267, 206},
-            {267, 170, 1000, 206},
-            {15, 206, 83, 242},
-            {83, 206, 129, 242},
-            {129, 206, 175, 242},
-            {175, 206, 221, 242},
-            {221, 206, 267, 242},
-            {267, 206, 1000, 242},
-            {15, 242, 83, 276},
-            {83, 242, 129, 276},
-            {129, 242, 175, 276},
-            {175, 242, 221, 276},
-            {221, 242, 267, 276},
-            {267, 242, 1000, 276},
-            {15, 276, 129, 312}, // enter
-            {129, 276, 175, 312},
-            {175, 276, 221, 312},
-            {221, 276, 267, 312},
-            {267, 276, 1000, 312},
-            {15, 312, 91, 348},
-            {91, 312, 147, 348},
-            {147, 312, 203, 348},
-            {203, 312, 259, 348},
-            {259, 312, 1000, 348},
-            {15, 348, 91, 383},
-            {91, 348, 147, 383},
-            {147, 348, 203, 383},
-            {203, 348, 259, 383},
-            {259, 348, 1000, 383},
-            {15, 383, 91, 418},
-            {91, 383, 147, 418},
-            {147, 383, 203, 418},
-            {203, 383, 259, 418},
-            {259, 383, 1000, 418},
-            {15, 418, 91, 1000},
-            {91, 418, 147, 1000},
-            {147, 418, 203, 1000},
-            {203, 418, 259, 1000},
-            {259, 418, 1000, 1000}
-        };
-        for(int i=0;i<buttons_coords.length;i++) {
-        	buttons_coords[i][0] -= 15;
-        	buttons_coords[i][2] -= 15;
-        }
-        
-        float aspect = (float) width / (float) height;
-        if (aspect < 1)
-        	aspect = 1/ aspect;
-        
-        float ratio_x = (float) width / 320;
-        if (height < width)
-        	ratio_x = (float) width / 480;
-        
-        float ratio_y = ratio_x;
-        
-    
-
-        icons_coords_land = new int [][] { { 62-34, 0 }, {105-34, 0}, {152-34, 0}, {197-34, 0}, {244-34, 0}, {287-34, 0} };
-        screen_coord_land = new int [] { 12, 1 };
-        screen_factor_x = ratio_x;
-        screen_factor_y = ratio_y;
-        back_factor_x = ratio_x;
-        back_factor_y = ratio_y;
-        screen_factor_land_x = ratio_x;
-        screen_factor_land_y = ratio_y;
-        back_factor_land_x = ratio_x;
-        back_factor_land_y = ratio_y;
-        buttons_coords_land = new int [][] {
-            {0, 130, 49, 170},
-            {49, 130, 95, 170},
-            {95, 130, 141, 170},
-            {141, 130, 187, 170},
-            {187, 130, 233, 170},
-            {233, 130, 286, 170},
-            {0, 170, 49, 206},
-            {49, 170, 95, 206},
-            {95, 170, 141, 206},
-            {141, 170, 187, 206},
-            {187, 170, 233, 206},
-            {233, 170, 286, 206},
-            {0, 206, 49, 242},
-            {49, 206, 95, 242},
-            {95, 206, 141, 242},
-            {141, 206, 187, 242},
-            {187, 206, 233, 242},
-            {233, 206, 286, 242},
-            {0, 242, 49, 1000},
-            {49, 242, 95, 1000},
-            {95, 242, 141, 1000},
-            {141, 242, 187, 1000},
-            {187, 242, 233, 1000},
-            {233, 242, 286, 1000},
-            {391, 40, 1000, 76}, // enter, 24
-            {391, 76, 433, 111},
-            {433, 76, 1000, 111},
-            {391, 111, 433, 146},
-            {433, 111, 1000, 146},
-            {286, 0, 337, 40},
-            {302, 149, 358, 186},
-            {358, 149, 414, 186},
-            {414, 149, 1000, 186},
-            {337, 0, 391, 40},
-            {286, 40, 337, 76},
-            {302, 186, 358, 224},
-            {358, 186, 414, 224},
-            {414, 186, 1000, 224}, // 37
-            {337, 40, 391, 76},
-            {286, 76, 337, 111},
-            {302, 224, 358, 258},
-            {358, 224, 414, 258},
-            {414, 224, 1000, 258}, // 42
-            {337, 76, 391, 111},
-            {286, 111, 337, 146},
-            {302, 258, 358, 1000},
-            {358, 258, 414, 1000},
-            {414, 258, 1000, 1000}, // 47
-            {337, 111, 391, 146}
-        };
-        
-        if ((width > 750 || height > 750) && mBackgroundImage.getWidth() == 480) //hdpi mode
-        {
-           screen_factor_x = 1.5f;
-           screen_factor_y = 1.5f;
-           screen_factor_land_x = 1.5f;
-           screen_factor_land_y = 1.5f;
-           
-           ratio_x = (float) width / 480;
-           if (height < width) // land
-        	   ratio_x = (float) width / 800;
-           
-           ratio_y = ratio_x;
-           
-        
-           back_factor_x = ratio_x;
-           back_factor_y = ratio_y;
-           back_factor_land_x = ratio_x;
-           back_factor_land_y = ratio_y;
-          
-           screen_factor_land_x = screen_factor_land_x * ratio_x;
-           screen_factor_land_y = screen_factor_land_y * ratio_y;
-           buttons_coords = new int [][] {
-        		{0, 215, 80, 274},
-        		{80, 215, 160, 274},
-        		{160, 215, 240, 274},
-        		{240, 215, 320, 274},
-        		{320, 215, 400, 274},
-        		{400, 215, 480, 274},
-        		{0, 274, 80, 336},
-        		{80, 274, 160, 336},
-        		{160, 274, 240, 336},
-        		{240, 274, 320, 336},
-        		{320, 274, 400, 336},
-        		{400, 274, 480, 336},
-        		{0, 336, 80, 396},
-        		{80, 336, 160, 396},
-        		{160, 336, 240, 396},
-        		{240, 336, 320, 396},
-        		{320, 336, 400, 396},
-        		{400, 336, 480, 396},
-        		{0, 396, 80, 454},
-        		{80, 396, 160, 454},
-        		{160, 396, 240, 454},
-        		{240, 396, 320, 454},
-        		{320, 396, 400, 454},
-        		{400, 396, 480, 454},
-        		{0, 454, 160, 514}, // enter
-        		{160, 454, 240, 514},
-        		{240, 454, 320, 514},
-        		{320, 454, 400, 514},
-        		{400, 454, 480, 514},
-        		{0, 514, 96, 576},
-        		{96, 514, 192, 576},
-        		{192, 514, 288, 576},
-        		{288, 514, 384, 576},
-        		{384, 514, 480, 576},
-        		{0, 576, 96, 638},
-        		{96, 576, 192, 638},
-        		{192, 576, 288, 638},
-        		{288, 576, 384, 638},
-        		{384, 576, 480, 638},
-        		{0, 638, 96, 698},
-        		{96, 638, 192, 698},
-        		{192, 638, 288, 698},
-        		{288, 638, 384, 698},
-        		{384, 638, 480, 698},
-        		{0, 698, 96, 1000},
-        		{96, 698, 192, 1000},
-        		{192, 698, 288, 1000},
-        		{288, 698, 384, 1000},
-        		{384, 698, 480, 1000}
-           };
-        } else {
-        	for(int i=0;i<MAX_TOUCHES;i++) {
-          	   buttons_coords[i][0] =(int) ((float) buttons_coords[i][0] * screen_factor_x);
-          	   buttons_coords[i][1] =(int) ((float) buttons_coords[i][1] * screen_factor_y);
-          	   buttons_coords[i][2] =(int) ((float) buttons_coords[i][2] * screen_factor_x);
-          	   buttons_coords[i][3] =(int) ((float) buttons_coords[i][3] * screen_factor_y);
-             }
-             
-             
-        }
-        
-        for(int i=0;i<MAX_TOUCHES;i++) {
-     	   buttons_coords_land[i][0] =(int) ((float) buttons_coords_land[i][0] * screen_factor_land_x);
-     	   buttons_coords_land[i][1] =(int) ((float) buttons_coords_land[i][1] * screen_factor_land_y);
-     	   buttons_coords_land[i][2] =(int) ((float) buttons_coords_land[i][2] * screen_factor_land_x);
-     	   buttons_coords_land[i][3] =(int) ((float) buttons_coords_land[i][3] * screen_factor_land_y);
-        }
-        
-        matrixScreen = new Matrix();
-        matrixBack= new Matrix();
-        
-        boolean land = currentOrientation == Configuration.ORIENTATION_LANDSCAPE;
-    	matrixBack.postScale(land?back_factor_land_x:back_factor_x, land?back_factor_land_y:back_factor_y);
-        
-    	matrixScreen.preTranslate(land?screen_coord_land[0]:screen_coord[0], land?screen_coord_land[1]:screen_coord[1]);
-        matrixScreen.postScale(land?screen_factor_land_x:screen_factor_x, land?screen_factor_land_y:screen_factor_y);
-        
-	}
-	*/
+	
 	public void updateContrast() {
 		SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(x48);
         String cString = mPrefs.getString("contrast", "1");
@@ -366,7 +103,6 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	//private short data [];
 	private Bitmap keys [] = new Bitmap[MAX_TOUCHES];
 	private Bitmap backBuffer;
-	private boolean newBuffer = true;
 	
 	public void refreshMainScreen(short data []) {
 		Canvas c = null;
@@ -381,7 +117,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
             			keybLite = false;
             		}
             		
-            		if (newBuffer) {
+            
 	            		if (backBuffer == null) {
 	            			Log.i("x48", "init backBuffer !: " + keybLite);
 	            			backBuffer = Bitmap.createBitmap(c.getWidth(), c.getHeight(), Bitmap.Config.ARGB_8888);
@@ -691,30 +427,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 							if (ann[i])
 								c.drawBitmap(annImages[i], icons_coords[i][0], icons_coords[i][1], null);
 						}
-            		} else {
-            	/*
-		            	if ((land?mBackgroundImageLand:mBackgroundImage) != null) {
-		            		c.drawBitmap(land?mBackgroundImageLand:mBackgroundImage, matrixBack, null);
-		                
-			                mainScreen.copyPixelsFromBuffer(ShortBuffer.wrap(data));
-			                c.drawBitmap(mainScreen, matrixScreen, null);
-			                
-			                for(int i=0;i<MAX_TOUCHES;i++) {
-			                    if (touches[i]) {
-			                        if (land)
-			                        	c.drawRoundRect(new RectF(new Rect(buttons_coords_land[i][0], buttons_coords_land[i][1], buttons_coords_land[i][2], buttons_coords_land[i][3])), 12f, 12f, paint);
-			                        else
-			                        	c.drawRoundRect(new RectF(new Rect(buttons_coords[i][0], buttons_coords[i][1], buttons_coords[i][2], buttons_coords[i][3])), 12f, 12f, paint);
-			                    }
-			                }
-			                
-			                for(int i=0;i<6;i++) {
-			                    if (ann[i])
-			                        c.drawBitmap(annImages[i], land?icons_coords_land[i][0]:icons_coords[i][0], land?icons_coords_land[i][1]:icons_coords[i][1], null);
-			                }
-		            	}
-		            	*/
-            		}
+            		
             	} else {
             		//Log.i("x48", "null canvas !");
             	}
@@ -741,34 +454,21 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 				return false;
 			int code = -1;
 			
-			 if (currentOrientation != Configuration.ORIENTATION_LANDSCAPE || newBuffer) {
-	                for(int i=0;i<MAX_TOUCHES;i++) {
-	                    if (x >= buttons_coords[i][0] && x < buttons_coords[i][2] && y >= buttons_coords[i][1] && y < buttons_coords[i][3])
-	                    {
-	                        code = i;
-	                        break;
-	                    }
-	                }
-	                if (code == -1 && action == MotionEvent.ACTION_DOWN && currentOrientation != Configuration.ORIENTATION_LANDSCAPE ) {
-	                	//x48.flipkeyboard();
-	                	keybLite = !keybLite;
-	                	backBuffer = null;
-	                	refreshMainScreen(null);
-	                	return true;
-	                }
-	            } else {
-
-	                /*for(int i=0;i<MAX_TOUCHES;i++) {
-	                    if (x >= buttons_coords_land[i][0] && x < buttons_coords_land[i][2] && y >= buttons_coords_land[i][1] && y < buttons_coords_land[i][3])
-	                    {
-	                        code = i;
-	                        break;
-	                    }
-	                }
-	                */
-	            }
-			 
-			//Log.i("x48", "action: " + action + " code: " + code);
+            for(int i=0;i<MAX_TOUCHES;i++) {
+                if (x >= buttons_coords[i][0] && x < buttons_coords[i][2] && y >= buttons_coords[i][1] && y < buttons_coords[i][3])
+                {
+                    code = i;
+                    break;
+                }
+            }
+            if (code == -1 && action == MotionEvent.ACTION_DOWN && currentOrientation != Configuration.ORIENTATION_LANDSCAPE ) {
+            	//x48.flipkeyboard();
+            	keybLite = !keybLite;
+            	backBuffer = null;
+            	refreshMainScreen(null);
+            	return true;
+            }
+       
 			if (code > -1) {
 				key(code, action == MotionEvent.ACTION_DOWN);
 				return action == MotionEvent.ACTION_DOWN;
@@ -1046,16 +746,5 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 			default: return false;
 		}
 	}
-
-	@Override
-	public boolean onTrackballEvent(MotionEvent event) {
-		/*float x = event.getX();
-		float y = event.getY();
-		int hs = event.getHistorySize();
-		Log.i("x48", "tevent: " + hs + " x: " + x + " - " + y);
-		return true;*/
-		return super.onTrackballEvent(event);
-	}
-	
 	
 }
