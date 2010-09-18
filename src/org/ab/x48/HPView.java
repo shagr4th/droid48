@@ -48,6 +48,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
     Matrix matrixScreen;
     Matrix matrixBack;
     Paint paint;
+    Paint screenPaint = null;
 
 	public HPView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -81,6 +82,9 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
         paint.setStyle(Style.FILL); 
         paint.setARGB(128, 250, 250, 250); 
 
+        screenPaint = null;
+		screenPaint = new Paint();
+		
         
 	}
 	
@@ -103,7 +107,16 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	//private short data [];
 	private Bitmap keys [] = new Bitmap[MAX_TOUCHES];
 	private Bitmap backBuffer;
+	private boolean fullWidth;
 	
+	public boolean isFullWidth() {
+		return fullWidth;
+	}
+
+	public void setFullWidth(boolean fullWidth) {
+		this.fullWidth = fullWidth;
+	}
+
 	public void refreshMainScreen(short data []) {
 		Canvas c = null;
 		try {
@@ -119,6 +132,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
             		
             
 	            		if (backBuffer == null) {
+	            			
 	            			Log.i("x48", "init backBuffer !: " + keybLite);
 	            			backBuffer = Bitmap.createBitmap(c.getWidth(), c.getHeight(), Bitmap.Config.ARGB_8888);
 	            			Canvas backCanvas = new Canvas(backBuffer);
@@ -130,6 +144,11 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 							p.setColor(srcColor);
 							backCanvas.drawRect(0, 0, w, h, p);
 							float lcd_ratio = (land?h:w) / 131;
+							screenPaint.setFilterBitmap(false);
+							if (!land && fullWidth) {
+								screenPaint.setFilterBitmap(true);
+								lcd_ratio = (land?h:(float)w) / 131;
+							}
 							int start_w = (int) (131*lcd_ratio);
 							int start_h = (int) (71*lcd_ratio);
 							float usable_w = w;
@@ -416,7 +435,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            		c.drawBitmap(backBuffer, 0, 0, null);
 	            		if (data != null)
 	            			mainScreen.copyPixelsFromBuffer(ShortBuffer.wrap(data));
-						c.drawBitmap(mainScreen, matrixScreen, null);
+						c.drawBitmap(mainScreen, matrixScreen, screenPaint);
 						for(int i=0;i<MAX_TOUCHES;i++) {
 							if (touches[i]) {
 								c.drawRoundRect(new RectF(new Rect(buttons_coords[i][0], buttons_coords[i][1], buttons_coords[i][2], buttons_coords[i][3])), 12f, 12f, paint);

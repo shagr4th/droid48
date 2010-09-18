@@ -39,5 +39,7 @@
 
 <string name="numpad_explain">You can also tap the LCD screen, more convenient !</string>
 <string name="saveonexit_msgbox_value">Save memory and stack on exit</string>
-<string name="haptic_feedback">Enable Haptic Feedback</string>
+<string name="haptic_feedback">Haptic feedback</string>
+<string name="large_width">Large LCD screen</string>
+<string name="large_width_summary">Portrait mode only</string>
 </resources>

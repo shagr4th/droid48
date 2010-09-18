@@ -36,6 +36,13 @@ public class Settings extends PreferenceActivity {
 	        hapticPref.setDefaultValue(true);
 	        inlinePrefCat.addPreference(hapticPref);
 	        
+	        CheckBoxPreference largeLCDPref = new CheckBoxPreference(this);
+	        largeLCDPref.setKey("large_width");
+	        largeLCDPref.setTitle(R.string.large_width);
+	        largeLCDPref.setSummary(R.string.large_width_summary);
+	        largeLCDPref.setDefaultValue(false);
+	        inlinePrefCat.addPreference(largeLCDPref);
+	        
 	        ListPreference listPref = new ListPreference(this);
 	        listPref.setEntries(R.array.contrast_entries);
 	        listPref.setEntryValues(R.array.contrast_values);

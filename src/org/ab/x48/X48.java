@@ -153,8 +153,11 @@ public class X48 extends Activity {
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 		saveonExit = mPrefs.getBoolean("saveOnExit", false);
 		haptic = mPrefs.getBoolean("haptic", true);
-		if (mainView != null)
+		largeWidth = mPrefs.getBoolean("large_width", false);
+		if (mainView != null) {
 			mainView.setHapticFeedbackEnabled(haptic);
+			mainView.setFullWidth(largeWidth);
+		}
 		currentOrientation = getResources().getConfiguration().orientation;
     }
     
@@ -372,9 +375,12 @@ public class X48 extends Activity {
    				String port2 = mPrefs.getString("port2", "0");
    				managePort(2, port2);
    				saveonExit = mPrefs.getBoolean("saveOnExit", false);
-   				haptic =  mPrefs.getBoolean("haptic", true);
-   				if (mainView != null)
+   				haptic = mPrefs.getBoolean("haptic", true);
+   				largeWidth = mPrefs.getBoolean("large_width", false);
+   				if (mainView != null) {
    					mainView.setHapticFeedbackEnabled(haptic);
+   					mainView.setFullWidth(largeWidth);
+   				}
    				
    			}
    		}
@@ -383,6 +389,7 @@ public class X48 extends Activity {
    
    private boolean saveonExit;
    private boolean haptic;
+   private boolean largeWidth;
 
    private void managePort(int number, String value) {
 	   int size = Integer.parseInt(value);
