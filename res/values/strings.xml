@@ -42,4 +42,6 @@
 <string name="haptic_feedback">Haptic feedback</string>
 <string name="large_width">Large LCD screen</string>
 <string name="large_width_summary">Portrait mode only</string>
+<string name="show_lite_keyb">Minimal controls</string>
+<string name="show_lite_keyb_summary">Also, easy shortcut: touch the LCD</string>
 </resources>

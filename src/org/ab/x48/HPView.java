@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -106,7 +107,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	
 	//private short data [];
 	private Bitmap keys [] = new Bitmap[MAX_TOUCHES];
-	private Bitmap backBuffer;
+	protected Bitmap backBuffer;
 	private boolean fullWidth;
 	
 	public boolean isFullWidth() {
@@ -126,11 +127,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
             	
             	if (c != null) {
             		
-            		if (land) {
-            			keybLite = false;
-            		}
             		
-            
 	            		if (backBuffer == null) {
 	            			
 	            			Log.i("x48", "init backBuffer !: " + keybLite);
@@ -174,7 +171,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 									{(int)(lcd_pos_x+67*lcd_ratio), 0}, {(int)(lcd_pos_x+91*lcd_ratio), 0}, {(int)(lcd_pos_x+112*lcd_ratio), 0} };
 							int green = Color.rgb(80, 96, 104);
 							p.setColor(green);
-							if (!keybLite)
+							if (!keybLite || land)
 								backCanvas.drawRect(0, 0, usable_w, start_h+menu_key_height, p);
 							
 							matrixScreen = new Matrix();
@@ -191,7 +188,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 								float key_width = 0f;
 								float key_y = 0f;
 								float key_height = 0f;
-								if (!keybLite) {
+								if (!keybLite || land) {
 									if (k < 6) {
 										// A, B, C...
 										key_width = usable_w / 6;
@@ -382,7 +379,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 											yrank = 4;
 										}
 										key_x = key_width*(4-xrank);
-										key_y = start_h + regular_key_height_right*(yrank);
+										key_y = start_h + key_height*(yrank);
 									} else
 										key_width = 0;
 								}
@@ -412,7 +409,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 									//ratio_ky = key_height / (float) bh;
 									delta_y = ((int)key_height-bh)/2;
 								}
-								if (!keybLite && !land && (k == 30 || k == 31 || k == 32 ||
+								if (!keybLite && !land && !fullWidth && (k == 30 || k == 31 || k == 32 ||
 										k == 35 || k == 36 || k == 37 ||
 										k == 40 || k == 41 || k == 42 || k == 39)) {
 									Paint p2 = new Paint();
@@ -482,9 +479,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
             }
             if (code == -1 && action == MotionEvent.ACTION_DOWN && currentOrientation != Configuration.ORIENTATION_LANDSCAPE ) {
             	//x48.flipkeyboard();
-            	keybLite = !keybLite;
-            	backBuffer = null;
-            	refreshMainScreen(null);
+            	((X48) getContext()).changeKeybLite();
             	return true;
             }
        
@@ -499,6 +494,14 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	
 	private boolean keybLite = false;
 	
+	public boolean isKeybLite() {
+		return keybLite;
+	}
+
+	public void setKeybLite(boolean keybLite) {
+		this.keybLite = keybLite;
+	}
+
 	public synchronized void key(int code, boolean down) {
 		//Log.i("x48", "code: " + code + " / " + down);
 		if (code < MAX_TOUCHES) {

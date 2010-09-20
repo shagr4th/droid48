@@ -11,6 +11,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
@@ -25,12 +26,7 @@ import android.view.Window;
 
 public class X48 extends Activity {
     
-	private KeyboardView theKeyboard = null;
-	private Keyboard currentKeyboardLayout = null;
-    private Keyboard theKeyboardLayout0 = null;
-    private Keyboard theKeyboardLayout1 = null;
-    
-    private HPView mainView;
+	private HPView mainView;
 	static final private int LOAD_ID = Menu.FIRST +1;
 	static final private int SAVE_ID = Menu.FIRST +2;
 	static final private int SETTINGS_ID = Menu.FIRST +5 ;
@@ -38,69 +34,6 @@ public class X48 extends Activity {
 	static final private int RESET_ID = Menu.FIRST +4 ;
 	
 	static final private int ROM_ID = 123;
-	
-	 public class theKeyboardActionListener implements OnKeyboardActionListener{
-
-	        @Override
-	        public void onKey(int primaryCode, int[] keyCodes) {
-	            
-	        }
-
-	        @Override
-	        public void onPress(int primaryCode) {
-	        	if (mainView != null)
-	        		mainView.key(primaryCode, true);
-	        }
-
-	        @Override
-	        public void onRelease(int primaryCode) {
-	        	
-	        	
-	        	if (mainView != null)
-	        		mainView.key(primaryCode, false);
-	        	
-	        	if (primaryCode == 39) {
-	        		if (currentKeyboardLayout.equals(theKeyboardLayout0)) {
-	        			currentKeyboardLayout = theKeyboardLayout1;
-	        			theKeyboard.setKeyboard(currentKeyboardLayout);
-	        		} else {
-	        			if (currentKeyboardLayout.equals(theKeyboardLayout1)) {
-		        			currentKeyboardLayout = theKeyboardLayout0;
-		        			theKeyboard.setKeyboard(currentKeyboardLayout);
-		        		}
-	        		}
-	        	}
-	        		
-	        	
-	        }
-
-	        @Override
-	        public void onText(CharSequence text) {
-	                // TODO Auto-generated method stub
-
-	        }
-
-	        @Override
-	        public void swipeDown() {
-	                
-	        }
-
-	        @Override
-	        public void swipeLeft() {
-	        	
-	        }
-
-	        @Override
-	        public void swipeRight() {
-	                // TODO Auto-generated method stub
-
-	        }
-
-	        @Override
-	        public void swipeUp() {
-	                // TODO Auto-generated method stub
-
-	        }};
 	
     // http://www.hpcalc.org/hp48/pc/emulators/gxrom-r.zip
 	
@@ -142,23 +75,30 @@ public class X48 extends Activity {
         setContentView(R.layout.main);
         mainView = (HPView) findViewById(R.id.hpview);
         
-        theKeyboard = (KeyboardView) findViewById(R.id.EditKeyboard01);
-        currentKeyboardLayout = theKeyboardLayout0 = new Keyboard(this, R.xml.state0);
-        theKeyboardLayout1 = new Keyboard(this, R.xml.state1);
-        theKeyboard.setKeyboard(currentKeyboardLayout);
-        theKeyboard.setOnKeyboardActionListener(new theKeyboardActionListener());
-        theKeyboard.setVisibility(View.INVISIBLE);
-        theKeyboard.setPreviewEnabled(false);
-        
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-		saveonExit = mPrefs.getBoolean("saveOnExit", false);
-		haptic = mPrefs.getBoolean("haptic", true);
-		largeWidth = mPrefs.getBoolean("large_width", false);
-		if (mainView != null) {
-			mainView.setHapticFeedbackEnabled(haptic);
-			mainView.setFullWidth(largeWidth);
-		}
+        checkPrefs();
 		currentOrientation = getResources().getConfiguration().orientation;
+    }
+    
+    public void checkPrefs() {
+    	SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		saveonExit = mPrefs.getBoolean("saveOnExit", false);
+		if (mainView != null) {
+			mainView.setHapticFeedbackEnabled(mPrefs.getBoolean("haptic", true));
+			mainView.setFullWidth(mPrefs.getBoolean("large_width", false));
+			mainView.setKeybLite(mPrefs.getBoolean("keybLite", false));
+		}
+    }
+        
+    public void changeKeybLite() {
+    	if (mainView != null) {
+    		mainView.setKeybLite(!mainView.isKeybLite());
+	    	SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+	    	Editor e = mPrefs.edit();
+	    	e.putBoolean("keybLite", mainView.isKeybLite());
+	    	e.commit();
+	    	mainView.backBuffer = null;
+        	refreshMainScreen(null);
+    	}
     }
     
     public void refreshMainScreen(short data []) {
@@ -216,7 +156,7 @@ public class X48 extends Activity {
        // given them shortcuts.
        //menu.add(0, RESET_ID, 0, R.string.reset);
        
-        menu.add(0, SAVE_ID, 0, R.string.save_state);
+       menu.add(0, SAVE_ID, 0, R.string.save_state);
        menu.add(0, LOAD_ID, 0, R.string.load_prog);
        menu.add(0, SETTINGS_ID, 0, R.string.settings);
        menu.add(0, RESET_ID, 0, R.string.reset_memory);
@@ -242,6 +182,7 @@ public class X48 extends Activity {
 	       case SAVE_ID:
 	    	  saveState();
 	    	   return true;
+	       
        	case LOAD_ID:
        		//loadProg("/data/data/org.ab.x48/SKUNK");
        		Intent loadFileIntent = new Intent();
@@ -374,13 +315,7 @@ public class X48 extends Activity {
    				managePort(1, port1);
    				String port2 = mPrefs.getString("port2", "0");
    				managePort(2, port2);
-   				saveonExit = mPrefs.getBoolean("saveOnExit", false);
-   				haptic = mPrefs.getBoolean("haptic", true);
-   				largeWidth = mPrefs.getBoolean("large_width", false);
-   				if (mainView != null) {
-   					mainView.setHapticFeedbackEnabled(haptic);
-   					mainView.setFullWidth(largeWidth);
-   				}
+   				checkPrefs();
    				
    			}
    		}
@@ -388,9 +323,7 @@ public class X48 extends Activity {
    }
    
    private boolean saveonExit;
-   private boolean haptic;
-   private boolean largeWidth;
-
+    
    private void managePort(int number, String value) {
 	   int size = Integer.parseInt(value);
 	   File f = AssetUtil.getSDDir();
@@ -475,22 +408,7 @@ public class X48 extends Activity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-		/*Log.i("x48", "corientation: " + currentOrientation);
-		if (currentOrientation != newConfig.orientation) {
-			Log.i("x48", "orientation: " + newConfig.orientation);
-			if (mainView != null)
-				mainView.pause(true);
-			currentOrientation = newConfig.orientation;
-		}*/
 		currentOrientation = newConfig.orientation;
-		if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE && theKeyboard.getVisibility()==View.VISIBLE)
-			theKeyboard.setVisibility(View.INVISIBLE);
 	}
 
-	public void flipkeyboard() {
-		if (theKeyboard.getVisibility()==View.VISIBLE)
-			theKeyboard.setVisibility(View.INVISIBLE);
-		else
-			theKeyboard.setVisibility(View.VISIBLE);
-	}
 }

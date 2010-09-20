@@ -43,6 +43,13 @@ public class Settings extends PreferenceActivity {
 	        largeLCDPref.setDefaultValue(false);
 	        inlinePrefCat.addPreference(largeLCDPref);
 	        
+	        CheckBoxPreference keybLitePref = new CheckBoxPreference(this);
+	        keybLitePref.setKey("keybLite");
+	        keybLitePref.setTitle(R.string.show_lite_keyb);
+	        keybLitePref.setSummary(R.string.show_lite_keyb_summary);
+	        keybLitePref.setDefaultValue(false);
+	        inlinePrefCat.addPreference(keybLitePref);
+	        
 	        ListPreference listPref = new ListPreference(this);
 	        listPref.setEntries(R.array.contrast_entries);
 	        listPref.setEntryValues(R.array.contrast_values);

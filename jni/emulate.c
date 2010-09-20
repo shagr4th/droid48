@@ -2483,7 +2483,7 @@ emulate()
       {
         schedule();
       }
-  } while (!enter_debugger);
+  } while (!enter_debugger); // exit_state
 
   return 0;
 }
