@@ -13,15 +13,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
-import android.inputmethodservice.Keyboard;
-import android.inputmethodservice.KeyboardView;
-import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 
 public class X48 extends Activity {
@@ -76,7 +72,6 @@ public class X48 extends Activity {
         mainView = (HPView) findViewById(R.id.hpview);
         
         checkPrefs();
-		currentOrientation = getResources().getConfiguration().orientation;
     }
     
     public void checkPrefs() {
@@ -403,12 +398,9 @@ public class X48 extends Activity {
 		
 	}
 	
-	private int currentOrientation;
-
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-		currentOrientation = newConfig.orientation;
 	}
 
 }

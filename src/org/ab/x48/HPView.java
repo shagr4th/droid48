@@ -1,12 +1,12 @@
 package org.ab.x48;
 
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -183,7 +183,15 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 							Paint keyPaint = new Paint();
 							keyPaint.setFilterBitmap(true);
 							
+							ArrayList<Integer> orderKeys = new ArrayList<Integer>();
 							for(int k=0;k<keys.length;k++) {
+								orderKeys.add(k);
+							}
+							orderKeys.add(0, orderKeys.remove(30));
+							orderKeys.add(0, orderKeys.remove(31));
+							orderKeys.add(0, orderKeys.remove(32));
+							
+							for(int k:orderKeys) {
 								float key_x = 0f;
 								float key_width = 0f;
 								float key_y = 0f;
@@ -409,7 +417,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 									//ratio_ky = key_height / (float) bh;
 									delta_y = ((int)key_height-bh)/2;
 								}
-								if (!keybLite && !land && !fullWidth && (k == 30 || k == 31 || k == 32 ||
+								if (!keybLite && !land && (k == 30 || k == 31 || k == 32 ||
 										k == 35 || k == 36 || k == 37 ||
 										k == 40 || k == 41 || k == 42 || k == 39)) {
 									Paint p2 = new Paint();
