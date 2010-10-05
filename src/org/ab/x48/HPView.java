@@ -318,19 +318,24 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 									}
 								} else {
 									if (k == 24) {
-										key_width = w / 2;
+										key_width = 2f * (float)w / 5f;
 										key_height = usable_h/5f;
 										key_x = 0;
 										key_y = start_h;
-									} else if (k == 27) {
-										key_width = w / 4;
+									} else if (k == 25) {
+										key_width = w / 5;
 										key_height = usable_h/5f;
 										key_x = 2*key_width;
 										key_y = start_h;
-									} else if (k == 28) {
-										key_width = w / 4;
+									} else if (k == 27) {
+										key_width = w / 5;
 										key_height = usable_h/5f;
 										key_x = 3*key_width;
+										key_y = start_h;
+									} else if (k == 28) {
+										key_width = w / 5;
+										key_height = usable_h/5f;
+										key_x = 4*key_width;
 										key_y = start_h;
 									} else if (k >= 30 && k <= 48 && k !=34 && k != 39 && k !=44) {
 										key_width = w / 4;
