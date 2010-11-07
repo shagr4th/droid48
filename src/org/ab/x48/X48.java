@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
+import android.view.WindowManager.LayoutParams;
 
 public class X48 extends Activity {
     
@@ -82,6 +83,14 @@ public class X48 extends Activity {
 			mainView.setFullWidth(mPrefs.getBoolean("large_width", false));
 			mainView.setKeybLite(mPrefs.getBoolean("keybLite", false));
 		}
+		if (mPrefs.getBoolean("fullScreen", false)) {
+			getWindow().addFlags(LayoutParams.FLAG_FULLSCREEN);
+			getWindow().clearFlags(LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+    	} else {
+    		getWindow().addFlags(LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+			getWindow().clearFlags(LayoutParams.FLAG_FULLSCREEN);
+		}
+		mainView.requestLayout();
     }
         
     public void changeKeybLite() {

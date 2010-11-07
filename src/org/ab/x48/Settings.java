@@ -50,6 +50,14 @@ public class Settings extends PreferenceActivity {
 	        keybLitePref.setDefaultValue(false);
 	        inlinePrefCat.addPreference(keybLitePref);
 	        
+	        CheckBoxPreference fullScreenPref = new CheckBoxPreference(this);
+	        fullScreenPref.setKey("fullScreen");
+	        fullScreenPref.setTitle(R.string.full_screen);
+	        fullScreenPref.setSummary(R.string.full_screen_summary);
+	        fullScreenPref.setDefaultValue(false);
+	        inlinePrefCat.addPreference(fullScreenPref);
+	        
+	        
 	        ListPreference listPref = new ListPreference(this);
 	        listPref.setEntries(R.array.contrast_entries);
 	        listPref.setEntryValues(R.array.contrast_values);

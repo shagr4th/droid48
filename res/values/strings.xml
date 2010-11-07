@@ -44,4 +44,6 @@
 <string name="large_width_summary">Portrait mode only</string>
 <string name="show_lite_keyb">Minimal controls</string>
 <string name="show_lite_keyb_summary">Also, easy shortcut: touch the LCD</string>
+<string name="full_screen">Hide the status bar</string>
+<string name="full_screen_summary">Full screen mode</string>
 </resources>

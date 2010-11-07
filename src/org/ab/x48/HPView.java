@@ -75,8 +75,10 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
        // mBackgroundImageLand = BitmapFactory.decodeResource(x48.getResources(), R.drawable.skin_landscape);
         //mBackgroundImage = BitmapFactory.decodeResource(x48.getResources(), R.drawable.skin);
         
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inScaled = false;
         for(int i=0;i<MAX_TOUCHES;i++) {
-        	keys[i] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.k01 + i);
+        	keys[i] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.k01 + i, opts);
         }
         
         paint = new Paint(); 
