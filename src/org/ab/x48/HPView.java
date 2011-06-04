@@ -39,7 +39,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	int ann_pos [] = { 62, 105, 152, 197, 244, 287 };
 	private List<Integer> queuedCodes;
 	private boolean touches [] = new boolean [MAX_TOUCHES];
-	
+	protected boolean needFlip;
 	private short buf [];
 	private int currentOrientation;
 	
@@ -109,7 +109,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	
 	//private short data [];
 	private Bitmap keys [] = new Bitmap[MAX_TOUCHES];
-	protected Bitmap backBuffer;
+	protected volatile Bitmap backBuffer;
 	private boolean fullWidth;
 	
 	public boolean isFullWidth() {
@@ -694,8 +694,10 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 			short data [] = x48.getScreen();
 			if (data != null && data.length > 0)
 				refreshMainScreen(data);*/
-			if (x48.fillScreenData(buf) == 1)
+			if (needFlip || x48.fillScreenData(buf) == 1) {
+				needFlip = false;
 				refreshMainScreen(buf);
+			}
 		}
 		Log.i("x48", "drawing thread stopped");
 	}

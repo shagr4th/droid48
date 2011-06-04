@@ -95,13 +95,15 @@ public class X48 extends Activity {
         
     public void changeKeybLite() {
     	if (mainView != null) {
-    		mainView.setKeybLite(!mainView.isKeybLite());
-	    	SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-	    	Editor e = mPrefs.edit();
-	    	e.putBoolean("keybLite", mainView.isKeybLite());
-	    	e.commit();
-	    	mainView.backBuffer = null;
-        	refreshMainScreen(null);
+    		SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+	    	if (!mPrefs.getBoolean("disableLite", false)) {
+	    		mainView.setKeybLite(!mainView.isKeybLite());
+		    	Editor e = mPrefs.edit();
+		    	e.putBoolean("keybLite", mainView.isKeybLite());
+		    	e.commit();
+		    	mainView.backBuffer = null;
+		    	mainView.needFlip = true;
+	    	}
     	}
     }
     

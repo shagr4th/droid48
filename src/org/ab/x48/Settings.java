@@ -50,6 +50,13 @@ public class Settings extends PreferenceActivity {
 	        keybLitePref.setDefaultValue(false);
 	        inlinePrefCat.addPreference(keybLitePref);
 	        
+	        CheckBoxPreference disableLite = new CheckBoxPreference(this);
+	        disableLite.setKey("disableLite");
+	        disableLite.setTitle(R.string.disableLite);
+	        disableLite.setSummary(R.string.disableLite_summary);
+	        disableLite.setDefaultValue(false);
+	        inlinePrefCat.addPreference(disableLite);
+	        
 	        CheckBoxPreference fullScreenPref = new CheckBoxPreference(this);
 	        fullScreenPref.setKey("fullScreen");
 	        fullScreenPref.setTitle(R.string.full_screen);
