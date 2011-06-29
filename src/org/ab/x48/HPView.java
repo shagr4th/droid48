@@ -38,7 +38,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	boolean ann [];
 	int ann_pos [] = { 62, 105, 152, 197, 244, 287 };
 	private List<Integer> queuedCodes;
-	private boolean touches [] = new boolean [MAX_TOUCHES];
+	private int touches [] = new int [MAX_TOUCHES];
 	protected boolean needFlip;
 	private short buf [];
 	private int currentOrientation;
@@ -449,7 +449,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            			mainScreen.copyPixelsFromBuffer(ShortBuffer.wrap(data));
 						c.drawBitmap(mainScreen, matrixScreen, screenPaint);
 						for(int i=0;i<MAX_TOUCHES;i++) {
-							if (touches[i]) {
+							if (touches[i] != 0) {
 								c.drawRoundRect(new RectF(new Rect(buttons_coords[i][0], buttons_coords[i][1], buttons_coords[i][2], buttons_coords[i][3])), 12f, 12f, paint);
 							}
 						}
@@ -473,34 +473,51 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
         }
 		//Log.i("x48", "data: " + data.length);
 	}
-	
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		synchronized (mSurfaceHolder) {
+			float x, y;
 			int action = event.getAction();
-			float x = event.getX();
-			float y = event.getY();
-			//Log.i("x48", "action: " + action + " / x: " + x + " / y:" + y);
-			if (action != MotionEvent.ACTION_DOWN && action != MotionEvent.ACTION_UP)
-				return false;
+			int actionCode = action & MotionEvent.ACTION_MASK;
 			int code = -1;
+			int pointerID = 0;
+
+			if( actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_UP ||
+					actionCode == MotionEvent.ACTION_POINTER_DOWN || actionCode == MotionEvent.ACTION_POINTER_UP ) {
+				pointerID = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+				x = event.getX(pointerID);
+				y = event.getY(pointerID);
+				pointerID = event.getPointerId(pointerID) + 1;
+			} else {
+				return false;
+			}
 			
-            for(int i=0;i<MAX_TOUCHES;i++) {
-                if (x >= buttons_coords[i][0] && x < buttons_coords[i][2] && y >= buttons_coords[i][1] && y < buttons_coords[i][3])
-                {
-                    code = i;
-                    break;
-                }
-            }
-            if (code == -1 && action == MotionEvent.ACTION_DOWN && currentOrientation != Configuration.ORIENTATION_LANDSCAPE ) {
+			// *_DOWN : lookup by coordinates
+			// *_UP : lookup by pointer pressed
+			if( actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_POINTER_DOWN ) {
+	            for(int i=0;i<MAX_TOUCHES;i++) {
+	                if (x >= buttons_coords[i][0] && x < buttons_coords[i][2] && y >= buttons_coords[i][1] && y < buttons_coords[i][3])
+	                {
+	                    code = i;
+	                    break;
+	                }
+	            }
+            } else {
+            	for(int i=0;i<MAX_TOUCHES;i++) {
+            		if(touches[i] == pointerID)
+            			code = i;
+            	}
+            }	            
+            if (code == -1 && actionCode == MotionEvent.ACTION_DOWN && currentOrientation != Configuration.ORIENTATION_LANDSCAPE ) {
             	//x48.flipkeyboard();
             	((X48) getContext()).changeKeybLite();
             	return true;
             }
        
 			if (code > -1) {
-				key(code, action == MotionEvent.ACTION_DOWN);
-				return action == MotionEvent.ACTION_DOWN;
+				key(code, actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_POINTER_DOWN, pointerID);
+				return true;
 			}
 		}
         
@@ -517,51 +534,35 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		this.keybLite = keybLite;
 	}
 
-	public synchronized void key(int code, boolean down) {
+	public void key(int code, boolean down) {
+		key(code, down, 255); // Use pointerID 255 for keyboard
+	}
+	
+	public synchronized void key(int code, boolean down, int pointerID) {
 		//Log.i("x48", "code: " + code + " / " + down);
 		if (code < MAX_TOUCHES) {
 			if (down) {
-				for(int i=0;i<MAX_TOUCHES;i++) {
-					if (touches[i]) {
-						Log.i("x48", "no multitouch !, force up of " + i);
-						queuedCodes.add(i + 100);
-						touches [i] = false;
-						break;
-					}
-				}
 				Integer cI = code+1;
 				if (!queuedCodes.contains(cI)) {
 					queuedCodes.add(cI);
-					touches [code] = true;
+					touches [code] = pointerID;
 					performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
 							HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
-					/*x48.flipScreen();*/
 				} else {
 					Log.i("x48", "rejected down");
 				}
 			}
 			else {
 				Integer cI = code+100;
-				if (!queuedCodes.contains(cI) && touches [code]) {
+				if (!queuedCodes.contains(cI) && touches [code] != 0) {
 					queuedCodes.add(cI);
-					touches [code] = false;
-					/*x48.flipScreen();*/
+					touches [code] = 0;
 				} else {
 					Log.i("x48", "rejected up");
-					for(int i=0;i<MAX_TOUCHES;i++) {
-						if (touches[i]) {
-							Log.i("x48", "forced up of " + i);
-							queuedCodes.add(i + 100);
-							touches [i] = false;
-						}
-					}
-					//queuedCodes.add(code + 1);
-					//queuedCodes.add(cI);
 				}
 			}
 			x48.flipScreen();
 			this.notify();
-	    	//pressed++;
 		}
 	}
 	
@@ -686,7 +687,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		while (mRun) {
 			try {
 			Thread.sleep(40);
-			
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -768,10 +769,9 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 			case KeyEvent.KEYCODE_V: if (d) key(21, true); else key(21, false); return true;
 			case KeyEvent.KEYCODE_W: if (d) key(22, true); else key(22, false); return true;
 			case KeyEvent.KEYCODE_X: if (d) key(23, true); else key(23, false); return true;
-			case KeyEvent.KEYCODE_Y: if (d) key(25, true); else key(26, false); return true;
-			case KeyEvent.KEYCODE_Z: if (d) key(26, true); else key(25, false); return true;
+			case KeyEvent.KEYCODE_Y: if (d) key(25, true); else key(25, false); return true;
+			case KeyEvent.KEYCODE_Z: if (d) key(26, true); else key(26, false); return true;
 			case KeyEvent.KEYCODE_SPACE: if (d) key(47, true); else key(47, false); return true;
-			
 			
 			//case KeyEvent.KEYCODE_SHIFT_LEFT: if (d) key(34, true); else key(34, false); return true;
 			//case KeyEvent.KEYCODE_SHIFT_RIGHT: if (d) key(39, true); else key(39, false); return true;
