@@ -481,12 +481,10 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 			int action = event.getAction();
 			int actionCode = action & MotionEvent.ACTION_MASK;
 			int code = -1;
-			int pointerID = 1;
+			int pointerID = 0;
 
-			if (actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_UP) {
-				x = event.getX();
-				y = event.getY();
-			} else if(actionCode == MotionEvent.ACTION_POINTER_DOWN || actionCode == MotionEvent.ACTION_POINTER_UP) {
+			if( actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_UP ||
+					actionCode == MotionEvent.ACTION_POINTER_DOWN || actionCode == MotionEvent.ACTION_POINTER_UP ) {
 				pointerID = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
 				x = event.getX(pointerID);
 				y = event.getY(pointerID);
@@ -497,7 +495,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 			
 			// *_DOWN : lookup by coordinates
 			// *_UP : lookup by pointer pressed
-			if( actionCode != MotionEvent.ACTION_UP && actionCode != MotionEvent.ACTION_POINTER_UP ) {
+			if( actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_POINTER_DOWN ) {
 	            for(int i=0;i<MAX_TOUCHES;i++) {
 	                if (x >= buttons_coords[i][0] && x < buttons_coords[i][2] && y >= buttons_coords[i][1] && y < buttons_coords[i][3])
 	                {
