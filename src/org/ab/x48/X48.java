@@ -203,8 +203,8 @@ public class X48 extends Activity {
        		
        		break;
 	       case QUIT_ID:
-	    	   stopHPEmulator();
-	    	   mainView.stop();
+	    	   //stopHPEmulator();
+	    	  // mainView.stop();
 	           finish();
 	           return true;
        }
