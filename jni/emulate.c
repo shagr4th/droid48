@@ -2413,7 +2413,7 @@ schedule()
 #endif
 
   schedule_event--;
-
+/*
   if (got_alarm) {
     got_alarm = 0;
 #ifdef HAVE_XSHM
@@ -2422,9 +2422,9 @@ schedule()
     GetEvent();
     //usleep(500);
   }
+*/
 
-
- // GetEvent();
+  GetEvent();
 }
 
 int

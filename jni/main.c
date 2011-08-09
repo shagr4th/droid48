@@ -89,30 +89,6 @@ int exit_state = 1;
 
 void
 #ifdef __FunctionProto__
-signal_handler(int sig)
-#else
-signal_handler(sig)
-int sig;
-#endif
-{
-  switch (sig) {
-    case SIGINT:
-      enter_debugger |= USER_INTERRUPT;
-	//LOGI("-sigint handler-");
-      break;
-    case SIGALRM:
-		got_alarm = 1;
-      break;
-    case SIGPIPE:
-      exit_x48(0);
-      exit (0);
-    default:
-      break;
-  }
-}
-
-void
-#ifdef __FunctionProto__
 save_options(int argc, char **argv)
 #else
 save_options(argc, argv)
@@ -209,8 +185,6 @@ printf("%s\n", nl_langinfo(CODESET));*/
   printf("0020\n");
 
   /*
-   *  install a handler for SIGALRM
-   */
   sigemptyset(&set);
   sigaddset(&set, SIGALRM);
   sa.sa_handler = signal_handler;
@@ -220,9 +194,7 @@ printf("%s\n", nl_langinfo(CODESET));*/
 #endif
   sigaction(SIGALRM, &sa, (struct sigaction *)0);
 
-  /*
-   *  install a handler for SIGINT
-   */
+
   sigemptyset(&set);
   sigaddset(&set, SIGINT);
   sa.sa_handler = signal_handler;
@@ -232,9 +204,7 @@ printf("%s\n", nl_langinfo(CODESET));*/
 #endif
   sigaction(SIGINT, &sa, (struct sigaction *)0);
 
-  /*
-   *  install a handler for SIGPIPE
-   */
+
   sigemptyset(&set);
   sigaddset(&set, SIGPIPE);
   sa.sa_handler = signal_handler;
@@ -244,15 +214,13 @@ printf("%s\n", nl_langinfo(CODESET));*/
 #endif
   sigaction(SIGPIPE, &sa, (struct sigaction *)0);
 
-  /*
-   * set the real time interval timer
-   */
+
   it.it_interval.tv_sec = 0;
   it.it_interval.tv_usec = 20000;
   it.it_value.tv_sec = 0;
   it.it_value.tv_usec = 20000;
   setitimer(ITIMER_REAL, &it, (struct itimerval *)0);
-
+*/
   /*
    * Set stdin flags to not include O_NDELAY and O_NONBLOCK
    */
@@ -260,7 +228,6 @@ printf("%s\n", nl_langinfo(CODESET));*/
   flags &= ~O_NDELAY;
   flags &= ~O_NONBLOCK;
   fcntl(STDIN_FILENO, F_SETFL, flags);
-
  
 
   
@@ -332,7 +299,7 @@ sigset_t set;
 
    init_active_stuff();
 
-   
+   /*
   sigemptyset(&set);
   sigaddset(&set, SIGALRM);
   sa.sa_handler = signal_handler;
@@ -369,7 +336,7 @@ sigset_t set;
   it.it_value.tv_sec = 0;
   it.it_value.tv_usec = 20000;
   setitimer(ITIMER_REAL, &it, (struct itimerval *)0);
-
+*/
  
   flags = fcntl(STDIN_FILENO, F_GETFL, 0);
   flags &= ~O_NDELAY;
