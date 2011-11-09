@@ -81,7 +81,9 @@ public class X48 extends Activity {
 		if (mainView != null) {
 			mainView.setHapticFeedbackEnabled(mPrefs.getBoolean("haptic", true));
 			mainView.setFullWidth(mPrefs.getBoolean("large_width", false));
+			mainView.setScaleControls(mPrefs.getBoolean("scale_buttons", false));
 			mainView.setKeybLite(mPrefs.getBoolean("keybLite", false));
+			mainView.setSound(mPrefs.getBoolean("sound", false));
 		}
 		if (mPrefs.getBoolean("fullScreen", false)) {
 			getWindow().addFlags(LayoutParams.FLAG_FULLSCREEN);
@@ -126,6 +128,7 @@ public class X48 extends Activity {
     public native int buttonPressed(int code);
     public native int buttonReleased(int code);
     public native void registerClass(X48 instance);
+    public native int fillAudioData(short data []);
     public native int fillScreenData(short data []);
     public native void flipScreen();
     public native int loadProg(String filename);

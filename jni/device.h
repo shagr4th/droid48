@@ -113,6 +113,8 @@ typedef struct device_t {
   char t1_touched;
   char t2_touched;
 
+  int speaker_counter;
+
 } device_t;
 
 extern device_t device;

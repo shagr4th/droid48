@@ -179,12 +179,61 @@ check_devices()
 #endif
 }
 
-#if 0
+#if 1
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+static char last_state = 0;
+//double last_time = 0;
+short audio_buf_short [32768];
+static int freq_counter = 0;
+static char speaker_state = 0;
+
+jint
+Java_org_ab_x48_X48_fillAudioData( JNIEnv*  env, jobject  this, jshortArray array) {
+
+	/*struct timeval tv;
+	gettimeofday(&tv, NULL);
+	double now = (double)tv.tv_sec + ((double)tv.tv_usec/1000000);*/
+	int numSamples = 0;
+	//if (last_time > 0) {
+		int count = device.speaker_counter;
+		//double deltaT = now-last_time;
+		double deltaT = 0.1; // on a mis le TimerTask à 100ms
+		numSamples = 44100 * deltaT;
+
+		 int i;
+
+		 if(count) {
+
+			float freq = count/deltaT;
+			int delta = 44100 / freq;
+			//LOGI("freq: %f count: %d delta: %d deltaT: %f numSamples: %d", freq, count, delta, deltaT, numSamples);
+			device.speaker_counter = 0;
+			for(i=0; i<numSamples; i++) {
+				freq_counter--;
+				if (freq_counter<0) {
+					freq_counter = delta;
+					speaker_state = !speaker_state;
+				}
+				audio_buf_short[i] = speaker_state ? 32767 : 0;
+			}
+		}
+		 else {
+
+				for(i=0; i<numSamples; i++) {
+					audio_buf_short[i] = 0;
+				}
+		}
+		(*env)->SetShortArrayRegion(env, array, 0, numSamples, audio_buf_short);
+	//}
+	//last_time = now;
+	return numSamples;
+}
+
 
 void
 #ifdef __FunctionProto__
@@ -193,17 +242,13 @@ check_out_register(void)
 check_out_register()
 #endif
 {
-  /*static int au = -2;
-  unsigned char c[] = { 0xff, 0x00 };
 
-  if (au == -2)
-    if ((au = open("/dev/audio", O_WRONLY)) < 0)
-  if (au < 0)
-    return;
-  if (saturn.OUT[2] & 0x8)
-    write(au, c, 1);
-  else
-    write(au, &c[1], 1);*/
+	char state = (saturn.OUT[2] & 0x8) == 0x8;
+	if (state != last_state) {
+			device.speaker_counter++;
+			last_state = state;
+	}
+
 }
 
 #endif

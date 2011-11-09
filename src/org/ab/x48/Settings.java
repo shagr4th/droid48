@@ -30,19 +30,6 @@ public class Settings extends PreferenceActivity {
 	        savePref.setSummary(R.string.saveonexit_msgbox_value);
 	        inlinePrefCat.addPreference(savePref);
 	        
-	        CheckBoxPreference hapticPref = new CheckBoxPreference(this);
-	        hapticPref.setKey("haptic");
-	        hapticPref.setTitle(R.string.haptic_feedback);
-	        hapticPref.setDefaultValue(true);
-	        inlinePrefCat.addPreference(hapticPref);
-	        
-	        CheckBoxPreference largeLCDPref = new CheckBoxPreference(this);
-	        largeLCDPref.setKey("large_width");
-	        largeLCDPref.setTitle(R.string.large_width);
-	        largeLCDPref.setSummary(R.string.large_width_summary);
-	        largeLCDPref.setDefaultValue(false);
-	        inlinePrefCat.addPreference(largeLCDPref);
-	        
 	        CheckBoxPreference keybLitePref = new CheckBoxPreference(this);
 	        keybLitePref.setKey("keybLite");
 	        keybLitePref.setTitle(R.string.show_lite_keyb);
@@ -56,24 +43,6 @@ public class Settings extends PreferenceActivity {
 	        disableLite.setSummary(R.string.disableLite_summary);
 	        disableLite.setDefaultValue(false);
 	        inlinePrefCat.addPreference(disableLite);
-	        
-	        CheckBoxPreference fullScreenPref = new CheckBoxPreference(this);
-	        fullScreenPref.setKey("fullScreen");
-	        fullScreenPref.setTitle(R.string.full_screen);
-	        fullScreenPref.setSummary(R.string.full_screen_summary);
-	        fullScreenPref.setDefaultValue(false);
-	        inlinePrefCat.addPreference(fullScreenPref);
-	        
-	        
-	        ListPreference listPref = new ListPreference(this);
-	        listPref.setEntries(R.array.contrast_entries);
-	        listPref.setEntryValues(R.array.contrast_values);
-	        listPref.setDefaultValue("1");
-	        listPref.setDialogTitle(R.string.choose_contrast_value);
-	        listPref.setKey("contrast");
-	        listPref.setTitle(R.string.choose_contrast);
-	        listPref.setSummary(R.string.choose_contrast_value);
-	        inlinePrefCat.addPreference(listPref);
 	        
 	        ListPreference backKeyPref = new ListPreference(this);
 	        backKeyPref.setEntries(R.array.backkey_entries);
@@ -90,6 +59,56 @@ public class Settings extends PreferenceActivity {
 	        togglePref.setTitle(R.string.choose_msgbox);
 	        togglePref.setSummary(R.string.choose_msgbox_value);
 	        inlinePrefCat.addPreference(togglePref);
+	        
+	        PreferenceCategory inlineDispPrefCat = new PreferenceCategory(this);
+	        inlineDispPrefCat.setTitle(R.string.display_preferences);
+	        root.addPreference(inlineDispPrefCat);
+	        
+	        CheckBoxPreference hapticPref = new CheckBoxPreference(this);
+	        hapticPref.setKey("haptic");
+	        hapticPref.setTitle(R.string.haptic_feedback);
+	        hapticPref.setDefaultValue(true);
+	        inlineDispPrefCat.addPreference(hapticPref);
+	        
+	        CheckBoxPreference soundPref = new CheckBoxPreference(this);
+	        soundPref.setKey("sound");
+	        soundPref.setTitle(R.string.sound);
+	        soundPref.setSummary(R.string.sound_summary);
+	        soundPref.setDefaultValue(false);
+	        inlineDispPrefCat.addPreference(soundPref);
+	        
+	        CheckBoxPreference largeLCDPref = new CheckBoxPreference(this);
+	        largeLCDPref.setKey("large_width");
+	        largeLCDPref.setTitle(R.string.large_width);
+	        largeLCDPref.setSummary(R.string.large_width_summary);
+	        largeLCDPref.setDefaultValue(false);
+	        inlineDispPrefCat.addPreference(largeLCDPref);
+	        
+	        CheckBoxPreference scaleControlsPref = new CheckBoxPreference(this);
+	        scaleControlsPref.setKey("scale_buttons");
+	        scaleControlsPref.setTitle(R.string.scale_buttons);
+	        scaleControlsPref.setSummary(R.string.scale_buttons_summary);
+	        scaleControlsPref.setDefaultValue(false);
+	        inlineDispPrefCat.addPreference(scaleControlsPref);
+	        
+	        CheckBoxPreference fullScreenPref = new CheckBoxPreference(this);
+	        fullScreenPref.setKey("fullScreen");
+	        fullScreenPref.setTitle(R.string.full_screen);
+	        fullScreenPref.setSummary(R.string.full_screen_summary);
+	        fullScreenPref.setDefaultValue(false);
+	        inlineDispPrefCat.addPreference(fullScreenPref);
+	        
+	        ListPreference listPref = new ListPreference(this);
+	        listPref.setEntries(R.array.contrast_entries);
+	        listPref.setEntryValues(R.array.contrast_values);
+	        listPref.setDefaultValue("1");
+	        listPref.setDialogTitle(R.string.choose_contrast_value);
+	        listPref.setKey("contrast");
+	        listPref.setTitle(R.string.choose_contrast);
+	        listPref.setSummary(R.string.choose_contrast_value);
+	        inlineDispPrefCat.addPreference(listPref);
+	        
+	       
 	        
 	        PreferenceCategory portPrefCat = new PreferenceCategory(this);
 	        portPrefCat.setTitle(R.string.ramcards_preferences);

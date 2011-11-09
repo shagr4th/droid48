@@ -13,6 +13,8 @@
 <string name="prog_ko">This program cannot be loaded.\nMake sure it\'s a valid one and you have enough memory to load it</string>
 <string name="rom_ko">Rom files not found! This shouldn\'t happen :\\. Quitting now...</string>
 <string name="general_preferences">General settings</string>
+<string name="display_preferences">Display/Sound settings</string>
+
 <string name="choose_contrast">Contrast</string>
 <string name="choose_contrast_value">Select the contrast</string>
 <string name="choose_backkey">Back key behavior</string>
@@ -46,6 +48,10 @@
 <string name="show_lite_keyb_summary">Also, easy shortcut: touch the LCD</string>
 <string name="full_screen">Hide the status bar</string>
 <string name="full_screen_summary">Full screen mode</string>
+<string name="scale_buttons">Autoscale touch controls</string>
+<string name="scale_buttons_summary">Scale when touch controls are too large (less sharp though)</string>
 <string name="disableLite">Disable minimal controls</string>
 <string name="disableLite_summary">Prevents lite controls to show up when touching LCD</string>
+<string name="sound">Enable (buggy) sound</string>
+<string name="sound_summary">EXPERIMENTAL: system beeps ok, so far</string>
 </resources>

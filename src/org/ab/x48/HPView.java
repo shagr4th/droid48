@@ -3,6 +3,8 @@ package org.ab.x48;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import android.content.Context;
@@ -17,6 +19,9 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Paint.Style;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -41,8 +46,12 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	private int touches [] = new int [MAX_TOUCHES];
 	protected boolean needFlip;
 	private short buf [];
+	private short audiobuf [];
 	private int currentOrientation;
 	private boolean multiTouch;
+	private AudioTrack track;
+	private TimerTask audioTask;
+	private Timer audioTimer;
 	
 	int buttons_coords [][] = new int [MAX_TOUCHES][4];
     int icons_coords [][] = new int [6][2];
@@ -64,6 +73,8 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
         queuedCodes = new Vector<Integer>();
         ann = new boolean [6];
         buf = new short [(14+128)*262];
+        audiobuf = new short [44100]; // 1s worth
+        track = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, 16384, AudioTrack.MODE_STREAM);
         annImages = new Bitmap [6];
         updateContrast();
         matrixScreen = new Matrix();
@@ -90,7 +101,20 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
         screenPaint = null;
 		screenPaint = new Paint();
 		
-        
+		audioTask = new TimerTask() {
+			@Override
+			public void run() {
+				if (mRun && track.getState() == AudioTrack.STATE_INITIALIZED) {
+					if (sound) {
+						track.play();
+						track.write(audiobuf, 0, x48.fillAudioData(audiobuf));
+					} else
+						track.stop();
+				}
+			}
+		};
+		audioTimer = new Timer();
+		audioTimer.schedule(audioTask, 0, 100);
 	}
 	
 	public void updateContrast() {
@@ -120,6 +144,16 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 
 	public void setFullWidth(boolean fullWidth) {
 		this.fullWidth = fullWidth;
+	}
+
+	private boolean scaleControls;
+	
+	public boolean isScaleControls() {
+		return scaleControls;
+	}
+
+	public void setScaleControls(boolean scaleControls) {
+		this.scaleControls = scaleControls;
 	}
 
 	public void refreshMainScreen(short data []) {
@@ -417,14 +451,21 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 								if (bw < (int) key_width) {
 									delta_x = ((int)key_width-bw)/2;
 								} else if (bw > (int) key_width) {
-									//ratio_kx = key_width / (float) bw;
-									delta_x = ((int)key_width-bw)/2;
+									if (scaleControls) {
+										float scaler = 1.0f;
+										if (k < 29)
+											scaler = 1.1f;
+										ratio_kx = scaler * key_width / (float) bw;
+									} else
+										delta_x = ((int)key_width-bw)/2;
 								}
 								if (bh < (int) key_height) {
 									delta_y = ((int)key_height-bh)/2;
 								} else if (bh > (int) key_height) {
-									//ratio_ky = key_height / (float) bh;
-									delta_y = ((int)key_height-bh)/2;
+									if (scaleControls)
+										ratio_ky = key_height / (float) bh;
+									else
+										delta_y = ((int)key_height-bh)/2;
 								}
 								if (!keybLite && !land && (k == 30 || k == 31 || k == 32 ||
 										k == 35 || k == 36 || k == 37 ||
@@ -560,6 +601,16 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 
 	public void setKeybLite(boolean keybLite) {
 		this.keybLite = keybLite;
+	}
+	
+	private boolean sound = false;
+
+	public boolean isSound() {
+		return sound;
+	}
+
+	public void setSound(boolean sound) {
+		this.sound = sound;
 	}
 
 	public void key(int code, boolean down) {
