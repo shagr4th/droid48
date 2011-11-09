@@ -251,7 +251,7 @@ Java_org_ab_x48_X48_registerClass( JNIEnv* env, jobject caller, jobject callback
 {
 	LOGI("--registerClass--");
 	android_env = env;
-	android_callback = callback;
+	android_callback = (*android_env)->NewGlobalRef(env, callback);
 	jclass x48 = (*android_env)->GetObjectClass(env, android_callback);
 	LOGI("--x48 registered--");
 	refreshMainScreen = (*android_env)->GetMethodID(android_env, x48, "refreshMainScreen", "([S)V");
