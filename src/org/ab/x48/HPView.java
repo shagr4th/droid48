@@ -74,7 +74,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
         ann = new boolean [6];
         buf = new short [(14+128)*262];
         audiobuf = new short [44100]; // 1s worth
-        track = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, 16384, AudioTrack.MODE_STREAM);
+        track = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, 16384, AudioTrack.MODE_STREAM);
         annImages = new Bitmap [6];
         updateContrast();
         matrixScreen = new Matrix();

@@ -52,6 +52,6 @@
 <string name="scale_buttons_summary">Scale when touch controls are too large (less sharp though)</string>
 <string name="disableLite">Disable minimal controls</string>
 <string name="disableLite_summary">Prevents lite controls to show up when touching LCD</string>
-<string name="sound">Enable (buggy) sound</string>
+<string name="sound">Enable sound</string>
 <string name="sound_summary">EXPERIMENTAL: system beeps ok, so far</string>
 </resources>
