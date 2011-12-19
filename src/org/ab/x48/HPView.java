@@ -221,6 +221,8 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 							Paint keyPaint = new Paint();
 							keyPaint.setFilterBitmap(true);
 							
+							Matrix keyMatrix [] = new Matrix[MAX_TOUCHES];
+							
 							ArrayList<Integer> orderKeys = new ArrayList<Integer>();
 							for(int k=0;k<keys.length;k++) {
 								orderKeys.add(k);
@@ -482,8 +484,12 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 									matrixKey.preScale(ratio_kx, ratio_ky);
 								}
 								matrixKey.postTranslate(key_x + delta_x, key_y + delta_y);
-								backCanvas.drawBitmap(keys[k], matrixKey, keyPaint);
+								keyMatrix[k] = matrixKey;
 								
+							}
+							for(int k:orderKeys) {
+								if (keyMatrix[k] != null)
+									backCanvas.drawBitmap(keys[k], keyMatrix[k], keyPaint);
 							}
 	            		}
 	            		
