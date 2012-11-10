@@ -1063,7 +1063,7 @@ const char *fname;
 {
   int ram_size;
 
-  if (!read_rom_file(romFileName, &saturn.rom, &rom_size))
+  if (!read_rom_file(fname, &saturn.rom, &rom_size))
     return 0;
   dev_memory_init();
 
@@ -1171,7 +1171,7 @@ read_files()
 
   strcpy(fnam, path);
 
-  strcat(fnam, "rom");
+  strcat(fnam, rom_filename);
 
   
   if (!read_rom_file(fnam, &saturn.rom, &rom_size))
@@ -1180,7 +1180,7 @@ read_files()
   rom_is_new = 0;
 
   strcpy(fnam, path);
-  strcat(fnam, "hp48");
+  strcat(fnam, conf_filename);
   if (NULL == (fp = fopen(fnam, "r")))
     {
       if (!quiet)
@@ -1329,7 +1329,7 @@ read_files()
     }
 
   strcpy(fnam, path);
-  strcat(fnam, "ram");
+  strcat(fnam, ram_filename);
   if ((fp = fopen(fnam, "r")) == NULL) {
     if (!quiet)
       LOGE( "%s: can\'t open %s\n", progname, fnam);
@@ -1346,7 +1346,7 @@ read_files()
   saturn.port1 = (unsigned char *)0;
 
   strcpy(fnam, path);
-  strcat(fnam, "port1");
+  strcat(fnam, port1_filename);
   if (stat(fnam, &st) >= 0)
     {
       port1_size = 2 * st.st_size;
@@ -1388,7 +1388,7 @@ read_files()
   saturn.port2 = (unsigned char *)0;
 
   strcpy(fnam, path);
-  strcat(fnam, "port2");
+  strcat(fnam, port2_filename);
   if (stat(fnam, &st) >= 0)
     {
       port2_size = 2 * st.st_size;
@@ -1665,7 +1665,7 @@ write_files()
   //strcat(path, "/");
 
   strcpy(fnam, path);
-  strcat(fnam, "hp48");
+  strcat(fnam, conf_filename);
 
 LOGI("trying to save: %s", fnam);
 
@@ -1761,7 +1761,7 @@ LOGI("trying to save: %s", fnam);
   if (rom_is_new)
     {
       strcpy(fnam, path);
-      strcat(fnam, "rom");
+      strcat(fnam, rom_filename);
       if (!write_mem_file(fnam, saturn.rom, rom_size))
         return 0;
     }
@@ -1772,14 +1772,14 @@ LOGI("trying to save: %s", fnam);
     ram_size = RAM_SIZE_SX;
 
   strcpy(fnam, path);
-  strcat(fnam, "ram");
+  strcat(fnam, ram_filename);
   if (!write_mem_file(fnam, saturn.ram, ram_size))
     return 0;
 
   if ((port1_size > 0) && port1_is_ram)
     {
       strcpy(fnam, path);
-      strcat(fnam, "port1");
+      strcat(fnam, port1_filename);
       if (!write_mem_file(fnam, saturn.port1, port1_size))
         return 0;
     }
@@ -1787,7 +1787,7 @@ LOGI("trying to save: %s", fnam);
   if ((port2_size > 0) && port2_is_ram)
     {
       strcpy(fnam, path);
-      strcat(fnam, "port2");
+      strcat(fnam, port2_filename);
       if (!write_mem_file(fnam, saturn.port2, port2_size))
         return 0;
     }
@@ -1811,7 +1811,21 @@ init_emulator()
       }
 
   init_saturn();
-  if (!read_rom(romFileName))
+
+  char           path[1024];
+
+    FILE          *sd;
+  	if (NULL == (sd = fopen("/sdcard/.hp48/", "rw"))) {
+  		strcpy(path, "/data/data/org.ab.x48/");
+
+  	}
+  	else
+  		strcpy(path, "/sdcard/.hp48/");
+
+
+    strcat(path, rom_filename);
+
+  if (!read_rom(path))
     exit(1);
   
   return 0;

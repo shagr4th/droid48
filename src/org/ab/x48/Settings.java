@@ -24,6 +24,13 @@ public class Settings extends PreferenceActivity {
 	        inlinePrefCat.setTitle(R.string.general_preferences);
 	        root.addPreference(inlinePrefCat);
 	        
+	        CheckBoxPreference h48Pref = new CheckBoxPreference(this);
+	        h48Pref.setKey("hp48s");
+	        h48Pref.setDefaultValue(false);
+	        h48Pref.setTitle(R.string.hp48s);
+	        h48Pref.setSummary(R.string.hp48s_summary);
+	        inlinePrefCat.addPreference(h48Pref);
+	        
 	        CheckBoxPreference savePref = new CheckBoxPreference(this);
 	        savePref.setKey("saveOnExit");
 	        savePref.setTitle(R.string.saveonexit_msgbox);

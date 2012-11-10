@@ -11,7 +11,7 @@ public class EmulatorThread extends Thread {
 	}
 	
 	public void run() {
-		x48.registerClass(x48);
+		x48.registerClass();
 		x48.startHPEmulator();
 	}
 

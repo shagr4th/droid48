@@ -242,6 +242,12 @@ typedef struct saturn_t {
 
 #define NIBBLES_PER_ROW 0x22
 
+extern char    rom_filename  [256];
+extern char    ram_filename  [256];
+extern char    conf_filename  [256];
+extern char    port1_filename [256];
+extern char    port2_filename [256];
+
 extern int		got_alarm;
 
 extern int		set_t1;

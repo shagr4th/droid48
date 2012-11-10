@@ -6,14 +6,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import android.content.res.AssetManager;
+import android.os.Environment;
 import android.util.Log;
 
 public class AssetUtil {
 	
 	public static void copyAsset(AssetManager am, boolean force) {
-		File sd = new File("/sdcard");
+		File sd = Environment.getExternalStorageDirectory();
 		if (sd.exists() && sd.isDirectory()) {
-			File hpDir = new File("/sdcard/.hp48");
+			File hpDir = new File(sd, ".hp48");
 			copyAsset(am, hpDir.exists() || hpDir.mkdir(), force);
 		} else {
 			copyAsset(am, false, force);
@@ -21,7 +22,7 @@ public class AssetUtil {
 	}
 	
 	public static File getSDDir() {
-		File hpDir = new File("/sdcard/.hp48");
+		File hpDir = new File(Environment.getExternalStorageDirectory(), ".hp48");
 		if (hpDir.exists())
 			return hpDir;
 		return null;
@@ -32,17 +33,24 @@ public class AssetUtil {
 			String assets[] = am.list( "" );
 			for( int i = 0 ; i < assets.length ; i++ ) {
 				boolean hp48 = assets[i].equals("hp48");
+				boolean hp48s = assets[i].equals("hp48s");
 				boolean ram = assets[i].equals("ram");
 				boolean rom = assets[i].equals("rom");
+				boolean rams = assets[i].equals("rams");
+				boolean roms = assets[i].equals("roms");
 				int required = 0;
 				if (ram)
 					required = 131072;
+				else if (rams)
+					required = 32768;
 				else if (rom)
 					required = 524288;
+				else if (roms)
+					required = 262144;
 				//boolean SKUNK = assets[i].equals("SKUNK");
-				if (hp48 || rom || ram) {
-					String rep = sd?"/sdcard/.hp48/":"/data/data/org.ab.x48/";
-					File fout = new File(rep + assets[i]);
+				if (hp48 || rom || ram || hp48s || roms || rams) {
+					File rep = sd?new File(Environment.getExternalStorageDirectory(), ".hp48"):Environment.getDataDirectory();
+					File fout = new File(rep, assets[i]);
 					if (!fout.exists() || fout.length() == 0 || (required > 0 && fout.length() != required) || force) {
 						Log.i("x48", "Overwriting " + assets[i]);
 						FileOutputStream out = new FileOutputStream(fout);
@@ -63,9 +71,9 @@ public class AssetUtil {
 	}
 	
 	public static boolean isFilesReady() {
-		File hpDir = new File("/sdcard/.hp48");
+		File hpDir = new File(Environment.getExternalStorageDirectory(), ".hp48");
 		if (!hpDir.exists() || !hpDir.isDirectory()) {
-			hpDir = new File("/data/data/org.ab.x48/");
+			hpDir = Environment.getDataDirectory();
 			if (!hpDir.exists() || !hpDir.isDirectory())
 				return false;
 		}

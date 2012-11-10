@@ -245,13 +245,44 @@ printf("%s\n", nl_langinfo(CODESET));*/
   return 0;
 }
 
+char    rom_filename [256];
+char    ram_filename [256];
+char    conf_filename [256];
+char    port1_filename [256];
+char    port2_filename [256];
 
 void
-Java_org_ab_x48_X48_registerClass( JNIEnv* env, jobject caller, jobject callback )
+Java_org_ab_x48_X48_registerClass( JNIEnv* env, jobject caller, jobject callback, jstring rom, jstring ram, jstring conf,
+jstring port1, jstring port2 )
 {
 	LOGI("--registerClass--");
 	android_env = env;
 	android_callback = (*android_env)->NewGlobalRef(env, callback);
+
+	const char * fp = (*android_env)->GetStringUTFChars(env, rom, NULL);
+	strcpy(rom_filename, fp);
+	(*android_env)->ReleaseStringUTFChars(env, rom, fp);
+
+	fp = (*android_env)->GetStringUTFChars(env, ram, NULL);
+	strcpy(ram_filename, fp);
+	(*android_env)->ReleaseStringUTFChars(env, ram, fp);
+
+	fp = (*android_env)->GetStringUTFChars(env, conf, NULL);
+	strcpy(conf_filename, fp);
+	(*android_env)->ReleaseStringUTFChars(env, conf, fp);
+	
+	fp = (*android_env)->GetStringUTFChars(env, port1, NULL);
+	strcpy(port1_filename, fp);
+	(*android_env)->ReleaseStringUTFChars(env, port1, fp);
+	
+	fp = (*android_env)->GetStringUTFChars(env, port2, NULL);
+	strcpy(port2_filename, fp);
+	(*android_env)->ReleaseStringUTFChars(env, port2, fp);
+	
+	/*strcpy(rom_filename , "roms");
+	strcpy(ram_filename,  "rams");
+	strcpy(conf_filename , "hp48s");*/
+
 	jclass x48 = (*android_env)->GetObjectClass(env, android_callback);
 	LOGI("--x48 registered--");
 	refreshMainScreen = (*android_env)->GetMethodID(android_env, x48, "refreshMainScreen", "([S)V");
@@ -262,28 +293,28 @@ Java_org_ab_x48_X48_registerClass( JNIEnv* env, jobject caller, jobject callback
 	LOGI("--methods registered--");
 }
 
-jstring
+void
 Java_org_ab_x48_X48_stopHPEmulator( JNIEnv* env, jobject thiz )
 {
 	exit (0);
 	//exit_state = 0;
 }
 
-jstring
+void
 Java_org_ab_x48_X48_saveState( JNIEnv* env, jobject thiz )
 {
 	LOGI("save_state");
 	write_files();
 }
 
-jstring
+void
 Java_org_ab_x48_X48_resetHPEmulator( JNIEnv* env, jobject thiz )
 {
 	do_reset();
 }
 
 
-jstring
+void
 Java_org_ab_x48_X48_startHPEmulator( JNIEnv* env, jobject thiz )
 {
 
@@ -359,7 +390,7 @@ sigset_t set;
   } while (exit_state);
   LOGI("exit loop");
 
-    return (*env)->NewStringUTF(env, "Hello from JNI !");
+    
 }
 
 jint

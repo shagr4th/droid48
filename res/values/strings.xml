@@ -54,4 +54,6 @@
 <string name="disableLite_summary">Prevents lite controls to show up when touching LCD</string>
 <string name="sound">Enable sound</string>
 <string name="sound_summary">EXPERIMENTAL: system beeps ok, so far</string>
+<string name="hp48s">HP48 S</string>
+<string name="hp48s_summary">Emulate an HP48S (Need App Restart !)</string>
 </resources>

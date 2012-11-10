@@ -72,6 +72,7 @@ public class X48 extends Activity {
         setContentView(R.layout.main);
         mainView = (HPView) findViewById(R.id.hpview);
         
+        hp48s = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("hp48s", false);
         checkPrefs();
     }
     
@@ -121,13 +122,13 @@ public class X48 extends Activity {
     	mainView.refreshIcons(i);
     }
     
-    public native String startHPEmulator();
-    public native String resetHPEmulator();
-    public native String saveState();
-    public native String stopHPEmulator();
+    public native void startHPEmulator();
+    public native void resetHPEmulator();
+    public native void saveState();
+    public native void stopHPEmulator();
     public native int buttonPressed(int code);
     public native int buttonReleased(int code);
-    public native void registerClass(X48 instance);
+    public native void registerClass(X48 instance, String rom_filename, String ram_filename, String conf_filename, String port1_filename, String port2_filename);
     public native int fillAudioData(short data []);
     public native int fillScreenData(short data []);
     public native void flipScreen();
@@ -332,8 +333,14 @@ public class X48 extends Activity {
    }
    
    private boolean saveonExit;
-    
-   private void managePort(int number, String value) {
+   private boolean hp48s;
+   
+   public boolean isHp48s() {
+	return hp48s;
+}
+
+
+private void managePort(int number, String value) {
 	   int size = Integer.parseInt(value);
 	   File f = AssetUtil.getSDDir();
 	   if (f != null) {
@@ -415,6 +422,12 @@ public class X48 extends Activity {
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+	}
+
+
+	public void registerClass() {
+		registerClass(this, hp48s?"roms":"rom", hp48s?"rams":"ram", hp48s?"hp48s":"hp48",
+				hp48s?"port1s":"port1", hp48s?"port2s":"port2");
 	}
 
 }
