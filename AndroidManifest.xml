@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.ab.x48" android:installLocation="auto" android:versionCode="35" android:versionName="1.35">
+      package="org.ab.x48" android:installLocation="auto" android:versionCode="40" android:versionName="1.40">
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:name=".X48"
                   android:label="@string/app_name"
-                  android:configChanges="keyboardHidden|orientation|screenSize" android:launchMode="singleTop">
+                  android:configChanges="keyboardHidden|orientation" android:launchMode="singleTop"> <!-- |screenSize -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -15,7 +15,7 @@
 </activity>
 <activity android:name=".Settings" android:label="@string/choose_contrast_value"></activity>
 </application>
-    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="10"/>
+    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="10"/>
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:resizeable="true" android:smallScreens="true" android:xlargeScreens="true"></supports-screens>
 
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
