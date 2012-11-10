@@ -14,11 +14,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Paint.Style;
+import android.graphics.Shader.TileMode;
+import android.graphics.Typeface;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -52,7 +55,10 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	private AudioTrack track;
 	private TimerTask audioTask;
 	private Timer audioTimer;
+	final float scale = getResources().getDisplayMetrics().density;
 	
+	int menu_button [];
+	int hidemenu_button [];
 	int buttons_coords [][] = new int [MAX_TOUCHES][4];
     int icons_coords [][] = new int [6][2];
    
@@ -60,7 +66,24 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
     Matrix matrixBack;
     Paint paint;
     Paint screenPaint = null;
-
+    
+    Paint asanaHeadGreenPaint;
+    Paint asanaHeadPurplePaint;
+    Paint asanaWhitePaint;
+    Paint asanaFootWhitePaint;
+    
+    Paint regularHeadGreenPaint;
+    Paint regularHeadPurplePaint;
+    Paint regularWhitePaint;
+    Paint regularFootWhitePaint;
+    
+    Paint buttonBorderPaint = new Paint();
+    
+    String topLefts [] = new String [MAX_TOUCHES];
+    String topRights [] = new String [MAX_TOUCHES];
+    String centers [] = new String [MAX_TOUCHES];
+    String bottomRights [] = new String [MAX_TOUCHES];
+	
 	public HPView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setFocusable(true);
@@ -87,12 +110,6 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
         annImages [5] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann06);
        // mBackgroundImageLand = BitmapFactory.decodeResource(x48.getResources(), R.drawable.skin_landscape);
         //mBackgroundImage = BitmapFactory.decodeResource(x48.getResources(), R.drawable.skin);
-        
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inScaled = false;
-        for(int i=0;i<MAX_TOUCHES;i++) {
-        	keys[i] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.k01 + i, opts);
-        }
         
         paint = new Paint(); 
         paint.setStyle(Style.FILL); 
@@ -134,7 +151,6 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	}
 	
 	//private short data [];
-	private Bitmap keys [] = new Bitmap[MAX_TOUCHES];
 	protected volatile Bitmap backBuffer;
 	private boolean fullWidth;
 	
@@ -155,6 +171,135 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	public void setScaleControls(boolean scaleControls) {
 		this.scaleControls = scaleControls;
 	}
+	
+	private void drawButton(Canvas backCanvas, boolean drawHeadersAndFooters, int insideColor, boolean insertMargins, int x0, int y0, int x1, int y1, String topLeft, String topRight, String center, String bottomRight) {
+		
+		if (y1 == 0)
+			return;
+		
+		int buttonMarginX = insertMargins?(int) (scale * 6):(int) (scale * 8);
+		int buttonMarginY = insertMargins?(int) (scale * 10):(int) (scale * 2);
+		
+		int marginX = insertMargins?(int) (scale * 1):(int) (scale * 1);
+		int marginY = insertMargins?(int) (scale * 1):(int) (scale * 1);
+		
+		int radius = (int) (5 * scale + 0.5f);
+		
+		int xx0 = x0 + buttonMarginX;
+		int xx1 = x1 - buttonMarginX;
+		int yy0 = y0 + buttonMarginY;
+		int yy1 = y1 - marginY;
+		
+		x0 = x0 + marginX;
+		x1 = x1 - marginX;
+		y0 = y0 + marginY;
+		y1 = y1 - marginY;
+		
+		Paint buttonPaint = new Paint();
+		buttonPaint.setShader(new LinearGradient(xx0, yy0, xx0, yy1, 0xFF081021, 0xFF6B7173, TileMode.CLAMP));
+		backCanvas.drawRoundRect(new RectF(xx0, yy0, xx1, yy1), radius, radius, buttonPaint);
+		backCanvas.drawRoundRect(new RectF(xx0, yy0, xx1, yy1), radius, radius, buttonBorderPaint);
+		if (insideColor != 0) {
+			int scaler = insideColor==Color.WHITE?4:1;
+			Paint centerPaint = new Paint();
+			centerPaint.setColor(insideColor);
+			centerPaint.setStyle(Style.FILL);
+			int xxx0 = xx0 + (int) (scale * scaler);
+			int xxx1 = xx1 - (int) (scale * scaler);
+			int yyy0 = yy0 + (int) (scale * scaler);
+			int yyy1 = yy1 - (int) (scale * scaler);
+			backCanvas.drawRoundRect(new RectF(xxx0, yyy0, xxx1, yyy1), radius, radius, centerPaint);
+		}
+		
+		if (center != null) {
+			
+			Paint WhitePaint = regularWhitePaint;
+			if (center.startsWith("$")) {
+				center = center.substring(1);
+				WhitePaint = asanaWhitePaint;
+			}
+			
+			Rect bounds = new Rect();
+			WhitePaint.getTextBounds(center, 0, center.length(), bounds);
+			int width = bounds.width();
+			WhitePaint.getTextBounds("A", 0, 1, bounds);
+			int height = bounds.height();
+			
+			int cX = x0 + ((x1 - x0 - width)/2);
+			int cY = height + y0 + ((y1 + buttonMarginY -marginY - y0 - height)/2);
+			
+			if (insideColor != 0)
+				WhitePaint.setColor(Color.BLACK);
+			
+			backCanvas.drawText(center, cX, cY, WhitePaint);
+			
+			if (insideColor != 0)
+				WhitePaint.setColor(Color.WHITE);
+			
+		}
+		
+		if (drawHeadersAndFooters && topLeft != null) {
+			
+			Paint HeadPurplePaint = regularHeadPurplePaint;
+			if (topLeft.startsWith("$")) {
+				topLeft = topLeft.substring(1);
+				HeadPurplePaint = asanaHeadPurplePaint;
+			}
+			
+			boolean centered = false;
+			if (topLeft.startsWith("/")) {
+				topLeft = topLeft.substring(1);
+				centered = true;
+			}
+			
+			Rect bounds = new Rect();
+			HeadPurplePaint.getTextBounds(topLeft, 0, topLeft.length(), bounds);
+			int width = bounds.width();
+			HeadPurplePaint.getTextBounds("A", 0, 1, bounds);
+			int height = bounds.height();
+			
+			int cX = centered?(x0 + ((x1 - x0 - width)/2)):x0;
+			
+			backCanvas.drawText(topLeft, cX, height + y0, HeadPurplePaint);
+			
+		}
+		
+		if (drawHeadersAndFooters && topRight != null) {
+			
+			Paint HeadGreenPaint = regularHeadGreenPaint;
+			if (topRight.startsWith("$")) {
+				topRight = topRight.substring(1);
+				HeadGreenPaint = asanaHeadGreenPaint;
+			}
+			
+			boolean centered = false;
+			if (topRight.startsWith("/")) {
+				topRight = topRight.substring(1);
+				centered = true;
+			}
+			
+			Rect bounds = new Rect();
+			HeadGreenPaint.getTextBounds(topRight, 0, topRight.length(), bounds);
+			int width = bounds.width();
+			HeadGreenPaint.getTextBounds("A", 0, 1, bounds);
+			int height = bounds.height();
+			
+			int cX = centered?(x0 + ((x1 - x0 - width)/2)):(x1 - width);
+			
+			backCanvas.drawText(topRight, cX, height + y0, HeadGreenPaint);
+			
+		}
+		
+		if (drawHeadersAndFooters && bottomRight != null) {
+			
+			Rect bounds = new Rect();
+			regularFootWhitePaint.getTextBounds(bottomRight, 0, bottomRight.length(), bounds);
+			int width = bounds.width();
+			
+			backCanvas.drawText(bottomRight, x1 - width, y1, regularFootWhitePaint);
+			
+		}
+	}
 
 	public void refreshMainScreen(short data []) {
 		Canvas c = null;
@@ -165,8 +310,96 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
             	
             	if (c != null) {
             		
-            		
 	            		if (backBuffer == null) {
+	            			
+	            			if (x48.isHp48s()) {
+	            				
+	            				topLefts = new String [] {
+		            	        		null, null, null, null, null, null,
+		            	        		"/PRINT", "/I/O", "/MODES", "/MEMORY", "/LIBRARY", "/PREV",
+		            	        		"UP", "DEF", "\u2192Q", "/GRAPH", "/REVIEW", "/SWAP",
+		            	        		" ASIN", " ACOS", " ATAN", " x\u00B2", " 10\u207F", " e\u207F", 
+		            	        		"EQUATION", "EDIT", "2D", "/PURGE", "DROP",
+		            	        		"USER", "/SOLVE", "/PLOT", "/ALGEBRA", " ( )",
+		            	        		null, "/TIME", "/STAT", "/UNITS", " [ ]",
+		            	        		null, "RAD", "STACK", "CMD", " \u00AB \u00BB",
+		            	        		" CONT", " =", " ,", " \u03C0", " { }",
+		            	        		null, null, null, null, null, null
+		            	        		};
+		            	        
+		            	        topRights = new String [] {
+		            	        		null, null, null, null, null, null,
+		            	        		null, null, null, null, null, null,
+		            	        		"HOME", "RCL", "\u2192NUM", null, null, null,
+		            	        		"\u2202 ", "\u222B ", "\u2211 ", "\u207F\u221Ay ", "LOG ", "LN ",
+		            	        		"MATRIX", "VISIT", "3D", null, "CLR",
+		            	        		"ENTRY", null, null, null, "# ",
+		            	        		null, null, null, null, "_ ",
+		            	        		null, "POLAR", "ARG", "MENU", "\" \" ",
+		            	        		"OFF ", "\u2192 ", "$\u21B5 ", "$\u2221 ", ": : ",
+		            	        		null, null, null, null, null, null
+		            	        		};
+		            	        
+		            	        centers = new String [] {
+		            	        		null, null, null, null, null, null,
+		            	        		"MTH", "PRG", "CST", "VAR", "$\u25B2", "NXT",
+		            	        		"'", "STO", "EVAL", "$\u25C0", "$\u25BC", "$\u25B6",
+		            	        		"SIN", "COS", "TAN", "\u221Ax", "y\u207F", "1/x",
+		            	        		"ENTER", "+/-", "EEX", "DEL", "\u2190",
+		            	        		"\u03B1", "7", "8", "9", "\u00F7",
+		            	        		"\u21B6", "4", "5", "6", "\u00D7",
+		            	        		"\u21B7", "1", "2", "3", "-",
+		            	        		"ON", "0", ".", "SPC", "+",
+		            	        		null, null, null, null, null, null
+		            	        		};
+		            	        
+	            			} else {
+	            			
+		            			topLefts = new String [] {
+		            	        		null, null, null, null, null, null,
+		            	        		"RAD", null, null, null, null, "PREV",
+		            	        		"UP", "DEF", "NUM", "/PICTURE", "/VIEW", "/SWAP",
+		            	        		" ASIN", " ACOS", " ATAN", " x\u00B2", " 10\u207F", " e\u207F", 
+		            	        		"EQUATION", "EDIT", "PURG", "/CLEAR", "/DROP",
+		            	        		"USER", null, null, null, " ( )",
+		            	        		null, null, null, null, " [ ]",
+		            	        		null, null, null, null, " \u00AB \u00BB",
+		            	        		" CONT", " =", " ,", " \u03C0", " { }",
+		            	        		null, null, null, null, null, null
+		            	        		};
+		            	        
+		            	        topRights = new String [] {
+		            	        		null, null, null, null, null, null,
+		            	        		"POLAR", "/CHARS", "/MODES", "/MEMORY", "/STACK", "MENU",
+		            	        		"HOME", "RCL", "UNDO", null, null, null,
+		            	        		"\u2202 ", "\u222B ", "\u2211 ", "\u207F\u221Ay ", "LOG ", "LN ",
+		            	        		"MATRIX", "CMD", "ARG", null, null,
+		            	        		"ENTRY", "/SOLVE", "/PLOT", "/SYMBOLIC", "# ",
+		            	        		null, "/TIME", "/STAT", "/UNITS", "_ ",
+		            	        		null, "/I/O", "/LIBRARY", "/EQ LIB", "\" \" ",
+		            	        		"OFF ", "\u2192 ", "$\u21B5 ", "$\u2221 ", ": : ",
+		            	        		null, null, null, null, null, null
+		            	        		};
+		            	        
+		            	        centers = new String [] {
+		            	        		null, null, null, null, null, null,
+		            	        		"MTH", "PRG", "CST", "VAR", "$\u25B2", "NXT",
+		            	        		"'", "STO", "EVAL", "$\u25C0", "$\u25BC", "$\u25B6",
+		            	        		"SIN", "COS", "TAN", "\u221Ax", "y\u207F", "1/x",
+		            	        		"ENTER", "+/-", "EEX", "DEL", "\u2190",
+		            	        		"\u03B1", "7", "8", "9", "\u00F7",
+		            	        		"\u21B6", "4", "5", "6", "\u00D7",
+		            	        		"\u21B7", "1", "2", "3", "-",
+		            	        		"ON", "0", ".", "SPC", "+",
+		            	        		null, null, null, null, null, null
+		            	        		};
+		            	       
+	            			}
+	            			
+	            			for(int i=0;i<24;i++)
+	            	        	bottomRights[i] = Character.toString((char) (65 + i));
+	            			bottomRights[25] = "Y";
+	            			bottomRights[26] = "Z";
 	            			
 	            			Log.i("x48", "init backBuffer !: " + keybLite);
 	            			backBuffer = Bitmap.createBitmap(c.getWidth(), c.getHeight(), Bitmap.Config.ARGB_8888);
@@ -221,10 +454,76 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 							Paint keyPaint = new Paint();
 							keyPaint.setFilterBitmap(true);
 							
-							Matrix keyMatrix [] = new Matrix[MAX_TOUCHES];
+							
+							Typeface asana = Typeface.createFromAsset(x48.getAssets(), "Asana-Math.ttf");
+							asana = Typeface.create(asana, Typeface.BOLD);
+							Typeface regular = Typeface.DEFAULT_BOLD;
+							
+							int regularbuttonTextHeaderSizeDpi = 11;
+							int regularbuttonTextSizeDpi = 17;
+							
+							int asanabuttonTextHeaderSizeDpi = 15;
+							int asanabuttonTextSizeDpi = 21;
+							
+							int topLeftColor = x48.isHp48s()?0xFFE4AE88:0xFFBD92BD;
+							int topRightColor = x48.isHp48s()?0xFF99D0EF:0xFF73DFC6;
+							
+							asanaHeadGreenPaint = new Paint();
+							asanaHeadGreenPaint.setTypeface(asana);
+							asanaHeadGreenPaint.setAntiAlias(true);
+							asanaHeadGreenPaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
+							asanaHeadGreenPaint.setColor(topRightColor);
+							
+							asanaHeadPurplePaint = new Paint();
+							asanaHeadPurplePaint.setTypeface(asana);
+							asanaHeadPurplePaint.setAntiAlias(true);
+							asanaHeadPurplePaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
+							asanaHeadPurplePaint.setColor(topLeftColor);
+							
+							asanaWhitePaint = new Paint();
+							asanaWhitePaint.setTypeface(asana);
+							asanaWhitePaint.setAntiAlias(true);
+							asanaWhitePaint.setTextSize(asanabuttonTextSizeDpi * scale + 0.5f);
+							asanaWhitePaint.setColor(Color.WHITE);
+							
+							asanaFootWhitePaint = new Paint();
+							asanaFootWhitePaint.setTypeface(asana);
+							asanaFootWhitePaint.setAntiAlias(true);
+							asanaFootWhitePaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
+							asanaFootWhitePaint.setColor(Color.WHITE);
+							
+							regularHeadGreenPaint = new Paint();
+							regularHeadGreenPaint.setTypeface(regular);
+							regularHeadGreenPaint.setAntiAlias(true);
+							regularHeadGreenPaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
+							regularHeadGreenPaint.setColor(topRightColor);
+							
+							regularHeadPurplePaint = new Paint();
+							regularHeadPurplePaint.setTypeface(regular);
+							regularHeadPurplePaint.setAntiAlias(true);
+							regularHeadPurplePaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
+							regularHeadPurplePaint.setColor(topLeftColor);
+							
+							regularWhitePaint = new Paint();
+							regularWhitePaint.setTypeface(regular);
+							regularWhitePaint.setAntiAlias(true);
+							regularWhitePaint.setTextSize(regularbuttonTextSizeDpi * scale + 0.5f);
+							regularWhitePaint.setColor(Color.WHITE);
+							
+							regularFootWhitePaint = new Paint();
+							regularFootWhitePaint.setTypeface(regular);
+							regularFootWhitePaint.setAntiAlias(true);
+							regularFootWhitePaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
+							regularFootWhitePaint.setColor(Color.WHITE);
+							
+							buttonBorderPaint.setColor(Color.BLACK);
+							buttonBorderPaint.setStyle(Paint.Style.STROKE);
+							buttonBorderPaint.setStrokeWidth(2 * scale + 0.5f);
+							
+							//Matrix keyMatrix [] = new Matrix[MAX_TOUCHES];
 							
 							ArrayList<Integer> orderKeys = new ArrayList<Integer>();
-							for(int k=0;k<keys.length;k++) {
+							for(int k=0;k<MAX_TOUCHES;k++) {
 								orderKeys.add(k);
 							}
 							orderKeys.add(0, orderKeys.remove(30));
@@ -444,13 +743,13 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 								buttons_coords[k][1] = (int) key_y;
 								buttons_coords[k][2] = (int) (key_x+key_width);
 								buttons_coords[k][3] = (int) (key_y+key_height);
-								int bw = keys[k].getWidth();
-								int bh = keys[k].getHeight();
-								int delta_x = 0;
-								int delta_y = 0;
-								float ratio_kx = 0.0f;
-								float ratio_ky = 0.0f;
-								if (bw < (int) key_width) {
+								//int bw = keys[k].getWidth();
+								//int bh = keys[k].getHeight();
+								//int delta_x = 0;
+								//int delta_y = 0;
+								//float ratio_kx = 0.0f;
+								//float ratio_ky = 0.0f;
+								/*if (bw < (int) key_width) {
 									delta_x = ((int)key_width-bw)/2;
 								} else if (bw > (int) key_width) {
 									if (scaleControls) {
@@ -468,7 +767,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 										ratio_ky = key_height / (float) bh;
 									else
 										delta_y = ((int)key_height-bh)/2;
-								}
+								}*/
 								if (!keybLite && !land && (k == 30 || k == 31 || k == 32 ||
 										k == 35 || k == 36 || k == 37 ||
 										k == 40 || k == 41 || k == 42 || k == 39)) {
@@ -477,19 +776,29 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 									backCanvas.drawRect(buttons_coords[k][0], buttons_coords[k][1], buttons_coords[k][2], buttons_coords[k][3], p2);
 								}
 								// slight off:
-								buttons_coords[k][1] += bh*5/36;
-								buttons_coords[k][3] += bh*5/36;
-								Matrix matrixKey = new Matrix();
+								//buttons_coords[k][1] += bh*5/36;
+								//buttons_coords[k][3] += bh*5/36;
+								/*Matrix matrixKey = new Matrix();
 								if (ratio_kx != 0 && ratio_ky != 0) {
 									matrixKey.preScale(ratio_kx, ratio_ky);
 								}
 								matrixKey.postTranslate(key_x + delta_x, key_y + delta_y);
-								keyMatrix[k] = matrixKey;
+								keyMatrix[k] = matrixKey;*/
 								
 							}
 							for(int k:orderKeys) {
-								if (keyMatrix[k] != null)
-									backCanvas.drawBitmap(keys[k], keyMatrix[k], keyPaint);
+								//if (keyMatrix[k] != null) {
+									//backCanvas.drawBitmap(keys[k], keyMatrix[k], keyPaint);
+									int insideColor = 0;
+									if (k < 6)
+										insideColor = 0xFFFFFFFF;
+									else if (k == 34)
+										insideColor = topLeftColor;
+									else if (k == 39)
+										insideColor = topRightColor;
+									drawButton(backCanvas, !keybLite, insideColor, k >= 6, buttons_coords[k][0], buttons_coords[k][1], buttons_coords[k][2], buttons_coords[k][3],
+											topLefts[k], topRights[k], centers[k], bottomRights[k]);
+								//}
 							}
 	            		}
 	            		
@@ -559,10 +868,15 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            			code = i;
 	            	}
 		            }	            
-	            if (code == -1 && actionCode == MotionEvent.ACTION_DOWN && currentOrientation != Configuration.ORIENTATION_LANDSCAPE ) {
-	            	//x48.flipkeyboard();
-	            	((X48) getContext()).changeKeybLite();
-	            	return true;
+	            if (code == -1 && actionCode == MotionEvent.ACTION_DOWN ) {
+	            	/*if (x >= menu_button[0] && x <= menu_button[2] && y >= menu_button[1] && y <= menu_button[3]) {
+	            		// call menu
+	            	} else if (x >= hidemenu_button[0] && x <= hidemenu_button[2] && y >= hidemenu_button[1] && y <= hidemenu_button[3]) {
+	            		// hide menu
+	            	} else*/ if (currentOrientation != Configuration.ORIENTATION_LANDSCAPE ) {
+	            		((X48) getContext()).changeKeybLite();
+	            		return true;
+	            	}
 	            }
 	       
 				if (code > -1) {
