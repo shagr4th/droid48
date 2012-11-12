@@ -49,7 +49,7 @@ public class AssetUtil {
 					required = 262144;
 				//boolean SKUNK = assets[i].equals("SKUNK");
 				if (hp48 || rom || ram || hp48s || roms || rams) {
-					File rep = sd?new File(Environment.getExternalStorageDirectory(), ".hp48"):Environment.getDataDirectory();
+					File rep = sd?new File(Environment.getExternalStorageDirectory(), ".hp48"):new File(Environment.getDataDirectory(), "data/org.ab.x48");
 					File fout = new File(rep, assets[i]);
 					if (!fout.exists() || fout.length() == 0 || (required > 0 && fout.length() != required) || force) {
 						Log.i("x48", "Overwriting " + assets[i]);
@@ -73,7 +73,7 @@ public class AssetUtil {
 	public static boolean isFilesReady() {
 		File hpDir = new File(Environment.getExternalStorageDirectory(), ".hp48");
 		if (!hpDir.exists() || !hpDir.isDirectory()) {
-			hpDir = Environment.getDataDirectory();
+			hpDir = new File(Environment.getDataDirectory(), "data/org.ab.x48");
 			if (!hpDir.exists() || !hpDir.isDirectory())
 				return false;
 		}
