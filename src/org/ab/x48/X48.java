@@ -32,52 +32,46 @@ public class X48 extends Activity {
 	
 	static final private int ROM_ID = 123;
 	
+	private static EmulatorThread thread;
+	
+	
     // http://www.hpcalc.org/hp48/pc/emulators/gxrom-r.zip
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //if (savedInstanceState == null) {
-     	   Log.i("x48", "starting activity");
-     	  /*if (!isRomReady()) {
-     		  // need to download the rom
-     		  Log.i("x48", "Need to download the rom...");
-     		 
-     		  Intent intent = new Intent(this, ROMDownloadActivity.class);
-     		 startActivityForResult(intent, 1);
-     	  } else {*/
-     	  AssetUtil.copyAsset(getResources().getAssets(), false);
-     	  readyToGo() ;
-     	  //}
-     	 if (!AssetUtil.isFilesReady()) {
-         	showDialog(DIALOG_ROM_KO);
-         }
-       // }
-        
-     	
+        Log.i("x48", "starting activity");
+        AssetUtil.copyAsset(getResources().getAssets(), false);
+        readyToGo() ;
+        if (!AssetUtil.isFilesReady()) {
+        	showDialog(DIALOG_ROM_KO);
+        }
     }
-    
-    
-    /*
-    private boolean isRomReady() {
-    	SharedPreferences mPrefs = getSharedPreferences("x48", 0);
-   	  String romLocation = mPrefs.getString("rom_location", null);
-   	  return (romLocation != null && new File(romLocation).exists() && new File(romLocation).length() == 524288);
-    }
-   */
-    
+ 
     public void readyToGo() {
+    	hp48s = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("hp48s", false);
+    	
     	requestWindowFeature(Window.FEATURE_NO_TITLE);
         requestWindowFeature(Window.FEATURE_PROGRESS);
         setContentView(R.layout.main);
         mainView = (HPView) findViewById(R.id.hpview);
         
-        hp48s = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("hp48s", false);
         checkPrefs();
+        
+        thread = new EmulatorThread(this);
+    	thread.start();
+    	
     }
     
     public void checkPrefs() {
     	SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	bitmapSkin = mPrefs.getBoolean("bitmapskin", false);
+    	mainView.backBuffer = null;
+    	mainView.needFlip = true;
+		String port1 = mPrefs.getString("port1", "0");
+		managePort(1, port1);
+		String port2 = mPrefs.getString("port2", "0");
+		managePort(2, port2);
 		saveonExit = mPrefs.getBoolean("saveOnExit", false);
 		if (mainView != null) {
 			mainView.setHapticFeedbackEnabled(mPrefs.getBoolean("haptic", true));
@@ -149,9 +143,10 @@ public class X48 extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.i("x48", "resuming");
+		Log.i("x48", "resume");
 		if (mainView  != null)
 			mainView.resume();
+		Log.i("x48", "resumed");
 	}
 
 	 /**
@@ -186,7 +181,6 @@ public class X48 extends Activity {
        case RESET_ID:
 	    	  AssetUtil.copyAsset(getResources().getAssets(), true);
 	    	  stopHPEmulator();
-	    	   mainView.stop();
 	           finish();
 	    	   return true;
 	       case SAVE_ID:
@@ -320,11 +314,6 @@ public class X48 extends Activity {
    				if (mainView != null)
    					mainView.updateContrast();
    				
-   				SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-   				String port1 = mPrefs.getString("port1", "0");
-   				managePort(1, port1);
-   				String port2 = mPrefs.getString("port2", "0");
-   				managePort(2, port2);
    				checkPrefs();
    				
    			}
@@ -334,11 +323,15 @@ public class X48 extends Activity {
    
    private boolean saveonExit;
    private boolean hp48s;
+   private boolean bitmapSkin = false;
    
    public boolean isHp48s() {
-	return hp48s;
-}
+	   return hp48s;
+   }
 
+   public boolean isBitmapSkin() {
+	   return bitmapSkin;
+   }
 
 private void managePort(int number, String value) {
 	   int size = Integer.parseInt(value);
@@ -381,13 +374,8 @@ private void managePort(int number, String value) {
 
 	@Override
 	protected void onStop() {
-		/*if (mainView  != null)
-			mainView.stop();*/
 		super.onStop();
 		Log.i("x48", "stop");
-		/*stopHPEmulator();
-		mainView.stop();
-		System.exit(1);*/
 	}
 	
 	@Override
@@ -401,10 +389,8 @@ private void managePort(int number, String value) {
 		super.onPause();
 		Log.i("x48", "pause");
 		if (mainView  != null)
-			mainView.pause(false);
-		/*stopHPEmulator();
-		mainView.stop();
-		System.exit(1);*/
+			mainView.pause();
+		Log.i("x48", "paused");
 	}
 
 	@Override
