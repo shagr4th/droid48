@@ -27,6 +27,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
@@ -37,7 +38,6 @@ import android.view.SurfaceView;
 public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
 
 	private static final int MAX_TOUCHES = 49;
-	private static EmulatorThread thread;
 	private Thread drawThread;
 	private X48 x48;
 	private Bitmap mainScreen;
@@ -55,14 +55,19 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	private AudioTrack track;
 	private TimerTask audioTask;
 	private Timer audioTimer;
-	final float scale = getResources().getDisplayMetrics().density;
+	float scale;
+	DisplayMetrics dm;
+	private Bitmap keys [] = new Bitmap[MAX_TOUCHES];
+	int screenLayout;
 	
 	int menu_button [];
 	int hidemenu_button [];
 	int buttons_coords [][] = new int [MAX_TOUCHES][4];
     int icons_coords [][] = new int [6][2];
    
-    Matrix matrixScreen;
+    Matrix keyMatrix [] = null;
+	
+	Matrix matrixScreen;
     Matrix matrixBack;
     Paint paint;
     Paint screenPaint = null;
@@ -76,6 +81,9 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
     Paint regularHeadPurplePaint;
     Paint regularWhitePaint;
     Paint regularFootWhitePaint;
+    
+    int topLeftColor;
+    int topRightColor;
     
     Paint buttonBorderPaint = new Paint();
     
@@ -108,8 +116,19 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
         annImages [3] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann04);
         annImages [4] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann05);
         annImages [5] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann06);
-       // mBackgroundImageLand = BitmapFactory.decodeResource(x48.getResources(), R.drawable.skin_landscape);
-        //mBackgroundImage = BitmapFactory.decodeResource(x48.getResources(), R.drawable.skin);
+        
+        dm = x48.getResources().getDisplayMetrics();
+        scale = dm.scaledDensity;
+        
+        float minLength = dm.widthPixels;
+        if (dm.heightPixels < minLength)
+        	minLength = dm.heightPixels;
+        
+        screenLayout = x48.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+        if (screenLayout >= 3) {
+        	// complètement arbitraire :\
+        	scale = scale * 1.75f;
+        }
         
         paint = new Paint(); 
         paint.setStyle(Style.FILL); 
@@ -121,7 +140,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		audioTask = new TimerTask() {
 			@Override
 			public void run() {
-				if (mRun && track.getState() == AudioTrack.STATE_INITIALIZED) {
+				if (pause && track.getState() == AudioTrack.STATE_INITIALIZED) {
 					if (sound) {
 						track.play();
 						track.write(audiobuf, 0, x48.fillAudioData(audiobuf));
@@ -180,7 +199,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		int buttonMarginX = insertMargins?(int) (scale * 6):(int) (scale * 8);
 		int buttonMarginY = insertMargins?(int) (scale * 10):(int) (scale * 2);
 		
-		int marginX = insertMargins?(int) (scale * 1):(int) (scale * 1);
+		int marginX = insertMargins?(int) (scale * 2):(int) (scale * 1);
 		int marginY = insertMargins?(int) (scale * 1):(int) (scale * 1);
 		
 		int radius = (int) (5 * scale + 0.5f);
@@ -188,7 +207,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		int xx0 = x0 + buttonMarginX;
 		int xx1 = x1 - buttonMarginX;
 		int yy0 = y0 + buttonMarginY;
-		int yy1 = y1 - marginY;
+		int yy1 = y1 - (buttonMarginY/2);
 		
 		x0 = x0 + marginX;
 		x1 = x1 - marginX;
@@ -226,7 +245,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 			int height = bounds.height();
 			
 			int cX = x0 + ((x1 - x0 - width)/2);
-			int cY = height + y0 + ((y1 + buttonMarginY -marginY - y0 - height)/2);
+			int cY = height + y0 + ((y1 + (buttonMarginY/2)- y0 - height)/2);
 			
 			if (insideColor != 0)
 				WhitePaint.setColor(Color.BLACK);
@@ -312,94 +331,191 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
             		
 	            		if (backBuffer == null) {
 	            			
-	            			if (x48.isHp48s()) {
-	            				
-	            				topLefts = new String [] {
-		            	        		null, null, null, null, null, null,
-		            	        		"/PRINT", "/I/O", "/MODES", "/MEMORY", "/LIBRARY", "/PREV",
-		            	        		"UP", "DEF", "\u2192Q", "/GRAPH", "/REVIEW", "/SWAP",
-		            	        		" ASIN", " ACOS", " ATAN", " x\u00B2", " 10\u207F", " e\u207F", 
-		            	        		"EQUATION", "EDIT", "2D", "/PURGE", "DROP",
-		            	        		"USER", "/SOLVE", "/PLOT", "/ALGEBRA", " ( )",
-		            	        		null, "/TIME", "/STAT", "/UNITS", " [ ]",
-		            	        		null, "RAD", "STACK", "CMD", " \u00AB \u00BB",
-		            	        		" CONT", " =", " ,", " \u03C0", " { }",
-		            	        		null, null, null, null, null, null
-		            	        		};
-		            	        
-		            	        topRights = new String [] {
-		            	        		null, null, null, null, null, null,
-		            	        		null, null, null, null, null, null,
-		            	        		"HOME", "RCL", "\u2192NUM", null, null, null,
-		            	        		"\u2202 ", "\u222B ", "\u2211 ", "\u207F\u221Ay ", "LOG ", "LN ",
-		            	        		"MATRIX", "VISIT", "3D", null, "CLR",
-		            	        		"ENTRY", null, null, null, "# ",
-		            	        		null, null, null, null, "_ ",
-		            	        		null, "POLAR", "ARG", "MENU", "\" \" ",
-		            	        		"OFF ", "\u2192 ", "$\u21B5 ", "$\u2221 ", ": : ",
-		            	        		null, null, null, null, null, null
-		            	        		};
-		            	        
-		            	        centers = new String [] {
-		            	        		null, null, null, null, null, null,
-		            	        		"MTH", "PRG", "CST", "VAR", "$\u25B2", "NXT",
-		            	        		"'", "STO", "EVAL", "$\u25C0", "$\u25BC", "$\u25B6",
-		            	        		"SIN", "COS", "TAN", "\u221Ax", "y\u207F", "1/x",
-		            	        		"ENTER", "+/-", "EEX", "DEL", "\u2190",
-		            	        		"\u03B1", "7", "8", "9", "\u00F7",
-		            	        		"\u21B6", "4", "5", "6", "\u00D7",
-		            	        		"\u21B7", "1", "2", "3", "-",
-		            	        		"ON", "0", ".", "SPC", "+",
-		            	        		null, null, null, null, null, null
-		            	        		};
-		            	        
+	            			if (x48.isBitmapSkin()) {
+	            				BitmapFactory.Options opts = new BitmapFactory.Options();
+	            		        opts.inScaled = false;
+	            		        
+	            		        // k01 = normal
+	            	        	// l01 = large | hdpi
+	            	        	// m01 = xlarge | xhdpi
+	            	        	// n01 = ldpi
+	            	        	int keyStartIndex = R.drawable.l01; 
+	            		        if (screenLayout >= 4 || dm.densityDpi >= DisplayMetrics.DENSITY_XHIGH) {
+	            		        	keyStartIndex = R.drawable.m01;
+	            		        } else if (screenLayout == 3 || dm.densityDpi == DisplayMetrics.DENSITY_HIGH) {
+	            		        	keyStartIndex = R.drawable.l01;
+	            		        } else if (screenLayout == 2 || dm.densityDpi == DisplayMetrics.DENSITY_MEDIUM) {
+	            		        	keyStartIndex = R.drawable.k01;
+	            		        } else if (screenLayout == 1 || dm.densityDpi == DisplayMetrics.DENSITY_LOW) {
+	            		        	keyStartIndex = R.drawable.n01;
+	            		        }
+	            		        
+	            		        for(int i=0;i<MAX_TOUCHES;i++) {
+	            		        	keys[i] = BitmapFactory.decodeResource(x48.getResources(), keyStartIndex + i, opts);
+	            		        }
+	            		        
+	            		        keyMatrix = new Matrix[MAX_TOUCHES];
 	            			} else {
 	            			
-		            			topLefts = new String [] {
-		            	        		null, null, null, null, null, null,
-		            	        		"RAD", null, null, null, null, "PREV",
-		            	        		"UP", "DEF", "NUM", "/PICTURE", "/VIEW", "/SWAP",
-		            	        		" ASIN", " ACOS", " ATAN", " x\u00B2", " 10\u207F", " e\u207F", 
-		            	        		"EQUATION", "EDIT", "PURG", "/CLEAR", "/DROP",
-		            	        		"USER", null, null, null, " ( )",
-		            	        		null, null, null, null, " [ ]",
-		            	        		null, null, null, null, " \u00AB \u00BB",
-		            	        		" CONT", " =", " ,", " \u03C0", " { }",
-		            	        		null, null, null, null, null, null
-		            	        		};
-		            	        
-		            	        topRights = new String [] {
-		            	        		null, null, null, null, null, null,
-		            	        		"POLAR", "/CHARS", "/MODES", "/MEMORY", "/STACK", "MENU",
-		            	        		"HOME", "RCL", "UNDO", null, null, null,
-		            	        		"\u2202 ", "\u222B ", "\u2211 ", "\u207F\u221Ay ", "LOG ", "LN ",
-		            	        		"MATRIX", "CMD", "ARG", null, null,
-		            	        		"ENTRY", "/SOLVE", "/PLOT", "/SYMBOLIC", "# ",
-		            	        		null, "/TIME", "/STAT", "/UNITS", "_ ",
-		            	        		null, "/I/O", "/LIBRARY", "/EQ LIB", "\" \" ",
-		            	        		"OFF ", "\u2192 ", "$\u21B5 ", "$\u2221 ", ": : ",
-		            	        		null, null, null, null, null, null
-		            	        		};
-		            	        
-		            	        centers = new String [] {
-		            	        		null, null, null, null, null, null,
-		            	        		"MTH", "PRG", "CST", "VAR", "$\u25B2", "NXT",
-		            	        		"'", "STO", "EVAL", "$\u25C0", "$\u25BC", "$\u25B6",
-		            	        		"SIN", "COS", "TAN", "\u221Ax", "y\u207F", "1/x",
-		            	        		"ENTER", "+/-", "EEX", "DEL", "\u2190",
-		            	        		"\u03B1", "7", "8", "9", "\u00F7",
-		            	        		"\u21B6", "4", "5", "6", "\u00D7",
-		            	        		"\u21B7", "1", "2", "3", "-",
-		            	        		"ON", "0", ".", "SPC", "+",
-		            	        		null, null, null, null, null, null
-		            	        		};
-		            	       
+	            				if (x48.isHp48s()) {
+	            					
+	            					topLefts = new String [] {
+	            	    	        		null, null, null, null, null, null,
+	            	    	        		"/PRINT", "/I/O", "/MODES", "/MEMORY", "/LIBRARY", "/PREV",
+	            	    	        		"UP", "DEF", "\u2192Q", "/GRAPH", "/REVIEW", "/SWAP",
+	            	    	        		" ASIN", " ACOS", " ATAN", "$x\u00B2", "$10\u207F", "$e\u207F", 
+	            	    	        		"EQUATION", "EDIT", "2D", "/PURGE", "DROP",
+	            	    	        		"USER", "/SOLVE", "/PLOT", "/ALGEBRA", " ( )",
+	            	    	        		null, "/TIME", "/STAT", "/UNITS", " [ ]",
+	            	    	        		null, "RAD", "STACK", "CMD", "$\u00AB \u00BB",
+	            	    	        		" CONT", " =", " ,", " \u03C0", " { }",
+	            	    	        		null, null, null, null, null, null
+	            	    	        		};
+	            	    	        
+	            	    	        topRights = new String [] {
+	            	    	        		null, null, null, null, null, null,
+	            	    	        		null, null, null, null, null, null,
+	            	    	        		"HOME", "RCL", "\u2192NUM", null, null, null,
+	            	    	        		"\u2202 ", "\u222B ", "\u2211 ", "\u207F\u221Ay ", "LOG ", "LN ",
+	            	    	        		"MATRIX", "VISIT", "3D", null, "CLR",
+	            	    	        		"ENTRY", null, null, null, "# ",
+	            	    	        		null, null, null, null, "_ ",
+	            	    	        		null, "POLAR", "ARG", "MENU", "\" \" ",
+	            	    	        		"OFF ", "\u2192 ", "$\u21B5 ", "$\u2221 ", ": : ",
+	            	    	        		null, null, null, null, null, null
+	            	    	        		};
+	            	    	        
+	            	    	        centers = new String [] {
+	            	    	        		null, null, null, null, null, null,
+	            	    	        		"MTH", "PRG", "CST", "VAR", "$\u25B2", "NXT",
+	            	    	        		"'", "STO", "EVAL", "$\u25C0", "$\u25BC", "$\u25B6",
+	            	    	        		"SIN", "COS", "TAN", "\u221Ax", "y\u207F", "1/x",
+	            	    	        		"ENTER", "+/-", "EEX", "DEL", "\u2190",
+	            	    	        		"\u03B1", "7", "8", "9", "\u00F7",
+	            	    	        		"$\u21B6", "4", "5", "6", "\u00D7",
+	            	    	        		"$\u21B7", "1", "2", "3", "-",
+	            	    	        		"ON", "0", ".", "SPC", "+",
+	            	    	        		null, null, null, null, null, null
+	            	    	        		};
+	            	    	        
+	            				} else {
+	            				
+	            	    			topLefts = new String [] {
+	            	    	        		null, null, null, null, null, null,
+	            	    	        		"RAD", null, null, null, null, "PREV",
+	            	    	        		"UP", "DEF", "NUM", "/PICTURE", "/VIEW", "/SWAP",
+	            	    	        		" ASIN", " ACOS", " ATAN", " x\u00B2", " 10\u207F", " e\u207F", 
+	            	    	        		"EQUATION", "EDIT", "PURG", "/CLEAR", "/DROP",
+	            	    	        		"USER", null, null, null, " ( )",
+	            	    	        		null, null, null, null, " [ ]",
+	            	    	        		null, null, null, null, "$\u00AB \u00BB",
+	            	    	        		" CONT", " =", " ,", " \u03C0", " { }",
+	            	    	        		null, null, null, null, null, null
+	            	    	        		};
+	            	    	        
+	            	    	        topRights = new String [] {
+	            	    	        		null, null, null, null, null, null,
+	            	    	        		"POLAR", "/CHARS", "/MODES", "/MEMORY", "/STACK", "MENU",
+	            	    	        		"HOME", "RCL", "UNDO", null, null, null,
+	            	    	        		"\u2202 ", "\u222B ", "\u2211 ", "\u207F\u221Ay ", "LOG ", "LN ",
+	            	    	        		"MATRIX", "CMD", "ARG", null, null,
+	            	    	        		"ENTRY", "/SOLVE", "/PLOT", "/SYMBOLIC", "# ",
+	            	    	        		null, "/TIME", "/STAT", "/UNITS", "_ ",
+	            	    	        		null, "/I/O", "/LIBRARY", "/EQ LIB", "\" \" ",
+	            	    	        		"OFF ", "\u2192 ", "$\u21B5 ", "$\u2221 ", ": : ",
+	            	    	        		null, null, null, null, null, null
+	            	    	        		};
+	            	    	        
+	            	    	        centers = new String [] {
+	            	    	        		null, null, null, null, null, null,
+	            	    	        		"MTH", "PRG", "CST", "VAR", "$\u25B2", "NXT",
+	            	    	        		"'", "STO", "EVAL", "$\u25C0", "$\u25BC", "$\u25B6",
+	            	    	        		"SIN", "COS", "TAN", "\u221Ax", "y\u207F", "1/x",
+	            	    	        		"ENTER", "+/-", "EEX", "DEL", "\u2190",
+	            	    	        		"\u03B1", "7", "8", "9", "\u00F7",
+	            	    	        		"$\u21B6", "4", "5", "6", "\u00D7",
+	            	    	        		"$\u21B7", "1", "2", "3", "-",
+	            	    	        		"ON", "0", ".", "SPC", "+",
+	            	    	        		null, null, null, null, null, null
+	            	    	        		};
+	            	    	       
+	            				}
+	            			
+	            				for(int i=0;i<24;i++)
+	            		        	bottomRights[i] = Character.toString((char) (65 + i));
+	            				bottomRights[25] = "Y";
+	            				bottomRights[26] = "Z";
+	            				
+	            				topLeftColor = x48.isHp48s()?0xFFE4AE88:0xFFBD92BD;
+	            				topRightColor = x48.isHp48s()?0xFF99D0EF:0xFF73DFC6;
+	            				
+	            				Typeface asana = Typeface.createFromAsset(x48.getAssets(), "Asana-Math.ttf");
+	            				//asana = Typeface.create(asana, Typeface.BOLD);
+	            				Typeface regular = Typeface.createFromAsset(x48.getAssets(), "NewsCycle-Regular.ttf"); //Typeface.MONOSPACE; //DEFAULT_BOLD;
+	            				Typeface regularBold = Typeface.createFromAsset(x48.getAssets(), "NewsCycle-bold.ttf"); 
+	            				
+	            				int regularbuttonTextHeaderSizeDpi = 11;
+	            				int regularbuttonTextSizeDpi = 17;
+	            				
+	            				int asanabuttonTextHeaderSizeDpi = 15;
+	            				int asanabuttonTextSizeDpi = 21;
+	            				
+	            				boolean antialias = true;
+	            				
+	            				asanaHeadGreenPaint = new Paint();
+	            				asanaHeadGreenPaint.setTypeface(asana);
+	            				asanaHeadGreenPaint.setAntiAlias(antialias);
+	            				asanaHeadGreenPaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				asanaHeadGreenPaint.setColor(topRightColor);
+	            				
+	            				asanaHeadPurplePaint = new Paint();
+	            				asanaHeadPurplePaint.setTypeface(asana);
+	            				asanaHeadPurplePaint.setAntiAlias(antialias);
+	            				asanaHeadPurplePaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				asanaHeadPurplePaint.setColor(topLeftColor);
+	            				
+	            				asanaWhitePaint = new Paint();
+	            				asanaWhitePaint.setTypeface(asana);
+	            				asanaWhitePaint.setAntiAlias(antialias);
+	            				asanaWhitePaint.setTextSize(asanabuttonTextSizeDpi * scale + 0.5f);
+	            				asanaWhitePaint.setColor(Color.WHITE);
+	            				
+	            				asanaFootWhitePaint = new Paint();
+	            				asanaFootWhitePaint.setTypeface(asana);
+	            				asanaFootWhitePaint.setAntiAlias(antialias);
+	            				asanaFootWhitePaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				asanaFootWhitePaint.setColor(Color.WHITE);
+	            				
+	            				regularHeadGreenPaint = new Paint();
+	            				regularHeadGreenPaint.setTypeface(regular);
+	            				regularHeadGreenPaint.setAntiAlias(antialias);
+	            				regularHeadGreenPaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				regularHeadGreenPaint.setColor(topRightColor);
+	            				
+	            				regularHeadPurplePaint = new Paint();
+	            				regularHeadPurplePaint.setTypeface(regular);
+	            				regularHeadPurplePaint.setAntiAlias(antialias);
+	            				regularHeadPurplePaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				regularHeadPurplePaint.setColor(topLeftColor);
+	            				
+	            				regularWhitePaint = new Paint();
+	            				regularWhitePaint.setTypeface(regularBold);
+	            				regularWhitePaint.setAntiAlias(antialias);
+	            				regularWhitePaint.setTextSize(regularbuttonTextSizeDpi * scale + 0.5f);
+	            				regularWhitePaint.setColor(Color.WHITE);
+	            				
+	            				regularFootWhitePaint = new Paint();
+	            				regularFootWhitePaint.setTypeface(regular);
+	            				regularFootWhitePaint.setAntiAlias(antialias);
+	            				regularFootWhitePaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				regularFootWhitePaint.setColor(Color.WHITE);
+	            				
+	            				buttonBorderPaint.setColor(Color.BLACK);
+	            				buttonBorderPaint.setStyle(Paint.Style.STROKE);
+	            				buttonBorderPaint.setStrokeWidth(1 * scale + 0.5f);
 	            			}
 	            			
-	            			for(int i=0;i<24;i++)
-	            	        	bottomRights[i] = Character.toString((char) (65 + i));
-	            			bottomRights[25] = "Y";
-	            			bottomRights[26] = "Z";
+	            	        
 	            			
 	            			Log.i("x48", "init backBuffer !: " + keybLite);
 	            			backBuffer = Bitmap.createBitmap(c.getWidth(), c.getHeight(), Bitmap.Config.ARGB_8888);
@@ -453,74 +569,6 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 							backCanvas.drawRect(lcd_pos_x, lcd_pos_y, lcd_pos_x_end, lcd_pos_y_end, p);
 							Paint keyPaint = new Paint();
 							keyPaint.setFilterBitmap(true);
-							
-							
-							Typeface asana = Typeface.createFromAsset(x48.getAssets(), "Asana-Math.ttf");
-							asana = Typeface.create(asana, Typeface.BOLD);
-							Typeface regular = Typeface.DEFAULT_BOLD;
-							
-							int regularbuttonTextHeaderSizeDpi = 11;
-							int regularbuttonTextSizeDpi = 17;
-							
-							int asanabuttonTextHeaderSizeDpi = 15;
-							int asanabuttonTextSizeDpi = 21;
-							
-							int topLeftColor = x48.isHp48s()?0xFFE4AE88:0xFFBD92BD;
-							int topRightColor = x48.isHp48s()?0xFF99D0EF:0xFF73DFC6;
-							
-							asanaHeadGreenPaint = new Paint();
-							asanaHeadGreenPaint.setTypeface(asana);
-							asanaHeadGreenPaint.setAntiAlias(true);
-							asanaHeadGreenPaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
-							asanaHeadGreenPaint.setColor(topRightColor);
-							
-							asanaHeadPurplePaint = new Paint();
-							asanaHeadPurplePaint.setTypeface(asana);
-							asanaHeadPurplePaint.setAntiAlias(true);
-							asanaHeadPurplePaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
-							asanaHeadPurplePaint.setColor(topLeftColor);
-							
-							asanaWhitePaint = new Paint();
-							asanaWhitePaint.setTypeface(asana);
-							asanaWhitePaint.setAntiAlias(true);
-							asanaWhitePaint.setTextSize(asanabuttonTextSizeDpi * scale + 0.5f);
-							asanaWhitePaint.setColor(Color.WHITE);
-							
-							asanaFootWhitePaint = new Paint();
-							asanaFootWhitePaint.setTypeface(asana);
-							asanaFootWhitePaint.setAntiAlias(true);
-							asanaFootWhitePaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
-							asanaFootWhitePaint.setColor(Color.WHITE);
-							
-							regularHeadGreenPaint = new Paint();
-							regularHeadGreenPaint.setTypeface(regular);
-							regularHeadGreenPaint.setAntiAlias(true);
-							regularHeadGreenPaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
-							regularHeadGreenPaint.setColor(topRightColor);
-							
-							regularHeadPurplePaint = new Paint();
-							regularHeadPurplePaint.setTypeface(regular);
-							regularHeadPurplePaint.setAntiAlias(true);
-							regularHeadPurplePaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
-							regularHeadPurplePaint.setColor(topLeftColor);
-							
-							regularWhitePaint = new Paint();
-							regularWhitePaint.setTypeface(regular);
-							regularWhitePaint.setAntiAlias(true);
-							regularWhitePaint.setTextSize(regularbuttonTextSizeDpi * scale + 0.5f);
-							regularWhitePaint.setColor(Color.WHITE);
-							
-							regularFootWhitePaint = new Paint();
-							regularFootWhitePaint.setTypeface(regular);
-							regularFootWhitePaint.setAntiAlias(true);
-							regularFootWhitePaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
-							regularFootWhitePaint.setColor(Color.WHITE);
-							
-							buttonBorderPaint.setColor(Color.BLACK);
-							buttonBorderPaint.setStyle(Paint.Style.STROKE);
-							buttonBorderPaint.setStrokeWidth(2 * scale + 0.5f);
-							
-							//Matrix keyMatrix [] = new Matrix[MAX_TOUCHES];
 							
 							ArrayList<Integer> orderKeys = new ArrayList<Integer>();
 							for(int k=0;k<MAX_TOUCHES;k++) {
@@ -743,31 +791,35 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 								buttons_coords[k][1] = (int) key_y;
 								buttons_coords[k][2] = (int) (key_x+key_width);
 								buttons_coords[k][3] = (int) (key_y+key_height);
-								//int bw = keys[k].getWidth();
-								//int bh = keys[k].getHeight();
-								//int delta_x = 0;
-								//int delta_y = 0;
-								//float ratio_kx = 0.0f;
-								//float ratio_ky = 0.0f;
-								/*if (bw < (int) key_width) {
-									delta_x = ((int)key_width-bw)/2;
-								} else if (bw > (int) key_width) {
-									if (scaleControls) {
-										float scaler = 1.0f;
-										if (k < 29)
-											scaler = 1.1f;
-										ratio_kx = scaler * key_width / (float) bw;
-									} else
+								int bw = 0;
+								int bh = 0; 
+								int delta_x = 0;
+								int delta_y = 0;
+								float ratio_kx = 0.0f;
+								float ratio_ky = 0.0f;
+								if (x48.isBitmapSkin()) {
+									bw = keys[k].getWidth();
+									bh = keys[k].getHeight();
+									if (bw < (int) key_width) {
 										delta_x = ((int)key_width-bw)/2;
-								}
-								if (bh < (int) key_height) {
-									delta_y = ((int)key_height-bh)/2;
-								} else if (bh > (int) key_height) {
-									if (scaleControls)
-										ratio_ky = key_height / (float) bh;
-									else
+									} else if (bw > (int) key_width) {
+										if (scaleControls) {
+											float scaler = 1.0f;
+											if (k < 29)
+												scaler = 1.1f;
+											ratio_kx = scaler * key_width / (float) bw;
+										} else
+											delta_x = ((int)key_width-bw)/2;
+									}
+									if (bh < (int) key_height) {
 										delta_y = ((int)key_height-bh)/2;
-								}*/
+									} else if (bh > (int) key_height) {
+										if (scaleControls)
+											ratio_ky = key_height / (float) bh;
+										else
+											delta_y = ((int)key_height-bh)/2;
+									}
+								}
 								if (!keybLite && !land && (k == 30 || k == 31 || k == 32 ||
 										k == 35 || k == 36 || k == 37 ||
 										k == 40 || k == 41 || k == 42 || k == 39)) {
@@ -775,30 +827,32 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 									p2.setColor(green);
 									backCanvas.drawRect(buttons_coords[k][0], buttons_coords[k][1], buttons_coords[k][2], buttons_coords[k][3], p2);
 								}
-								// slight off:
-								//buttons_coords[k][1] += bh*5/36;
-								//buttons_coords[k][3] += bh*5/36;
-								/*Matrix matrixKey = new Matrix();
-								if (ratio_kx != 0 && ratio_ky != 0) {
-									matrixKey.preScale(ratio_kx, ratio_ky);
+								if (x48.isBitmapSkin()) {
+									// slight off:
+									buttons_coords[k][1] += bh*5/36;
+									buttons_coords[k][3] += bh*5/36;
+									Matrix matrixKey = new Matrix();
+									if (ratio_kx != 0 && ratio_ky != 0) {
+										matrixKey.preScale(ratio_kx, ratio_ky);
+									}
+									matrixKey.postTranslate(key_x + delta_x, key_y + delta_y);
+									keyMatrix[k] = matrixKey;
 								}
-								matrixKey.postTranslate(key_x + delta_x, key_y + delta_y);
-								keyMatrix[k] = matrixKey;*/
-								
 							}
 							for(int k:orderKeys) {
-								//if (keyMatrix[k] != null) {
-									//backCanvas.drawBitmap(keys[k], keyMatrix[k], keyPaint);
-									int insideColor = 0;
-									if (k < 6)
-										insideColor = 0xFFFFFFFF;
-									else if (k == 34)
-										insideColor = topLeftColor;
-									else if (k == 39)
-										insideColor = topRightColor;
-									drawButton(backCanvas, !keybLite, insideColor, k >= 6, buttons_coords[k][0], buttons_coords[k][1], buttons_coords[k][2], buttons_coords[k][3],
-											topLefts[k], topRights[k], centers[k], bottomRights[k]);
-								//}
+								if (!x48.isBitmapSkin()) {
+										int insideColor = 0;
+										if (k < 6)
+											insideColor = 0xFFFFFFFF;
+										else if (k == 34)
+											insideColor = topLeftColor;
+										else if (k == 39)
+											insideColor = topRightColor;
+										drawButton(backCanvas, !keybLite, insideColor, k >= 6, buttons_coords[k][0], buttons_coords[k][1], buttons_coords[k][2], buttons_coords[k][3],
+												topLefts[k], topRights[k], centers[k], bottomRights[k]);
+								} else if (keyMatrix != null && keyMatrix[k] != null) {
+									backCanvas.drawBitmap(keys[k], keyMatrix[k], keyPaint);
+								}
 							}
 	            		}
 	            		
@@ -1036,24 +1090,15 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.i("x48", "Surface created");
-		if (thread == null) {
-			thread = new EmulatorThread(x48);
-			thread.start();
+		if (drawThread == null) {
+			drawThread = new Thread(this);
+			drawThread.start();
 		}
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		Log.i("x48", "Surface destroyed");
-		/*if (thread != null) {
-	        while (retry) {
-	            try {
-	                thread.join();
-	                retry = false;
-	            } catch (InterruptedException e) {
-	            }
-	        }
-		}*/
 	}
 
 	@Override
@@ -1063,62 +1108,38 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
         }
     }
 	
-	public void stop() {
-		Log.i("x48", "Stopping..");
-		if (thread != null)
-			thread.interrupt();
-		thread = null;
-	}
-	
 	public void refreshIcons(boolean ann []) {
 		this.ann = ann;
-		//x48.flipScreen();
-		//refreshMainScreen(null);
 	}
 	
-	private boolean mRun;
+	private boolean pause;
 	
-	public void pause(boolean fast) {
-		mRun = false;
-		if (fast && drawThread != null) {
-			try {
-				drawThread.join(0);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+	public void pause() {
+		pause = true;
 	}
 	
 	public void resume() {
-		Log.i("x48", "resume");
-		if (thread != null) {
-			mRun = true;
-			drawThread = new Thread(this);
-			drawThread.start();
-		}
+		pause = false;
 	}
 
 	@Override
 	public void run() {
 		Log.i("x48", "drawing thread started");
 		x48.flipScreen();
-		while (mRun) {
-			try {
-			Thread.sleep(40);
-
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			/*
-			short data [] = x48.getScreen();
-			if (data != null && data.length > 0)
-				refreshMainScreen(data);*/
+		while (true) {
 			if (needFlip || x48.fillScreenData(buf) == 1) {
 				needFlip = false;
 				refreshMainScreen(buf);
 			}
+			do {
+				try {
+					Thread.sleep(40);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			} while (pause);
 		}
-		Log.i("x48", "drawing thread stopped");
+		//Log.i("x48", "drawing thread stopped");
 	}
 
 	@Override
