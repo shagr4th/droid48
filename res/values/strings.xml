@@ -13,7 +13,8 @@
 <string name="prog_ko">This program cannot be loaded.\nMake sure it\'s a valid one and you have enough memory to load it</string>
 <string name="rom_ko">Rom files not found! This shouldn\'t happen :\\. Quitting now...</string>
 <string name="general_preferences">General settings</string>
-<string name="display_preferences">Display/Sound settings</string>
+<string name="display_preferences">Display settings</string>
+<string name="misc_preferences">Misc settings</string>
 
 <string name="choose_contrast">Contrast</string>
 <string name="choose_contrast_value">Select the contrast</string>
@@ -56,4 +57,6 @@
 <string name="sound_summary">EXPERIMENTAL: system beeps ok, so far</string>
 <string name="hp48s">HP48 S</string>
 <string name="hp48s_summary">Emulate an HP48S (Need App Restart !)</string>
+<string name="bitmapSkin">HP48 Bitmap Skin</string>
+<string name="bitmapSkin_summary">Restore the previous bitmap skin (48G mode only !)</string>
 </resources>

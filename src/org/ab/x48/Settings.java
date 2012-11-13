@@ -3,6 +3,8 @@ package org.ab.x48;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
@@ -24,12 +26,26 @@ public class Settings extends PreferenceActivity {
 	        inlinePrefCat.setTitle(R.string.general_preferences);
 	        root.addPreference(inlinePrefCat);
 	        
-	        CheckBoxPreference h48Pref = new CheckBoxPreference(this);
+	        final CheckBoxPreference bitmapSkinPref = new CheckBoxPreference(this);
+	        final CheckBoxPreference scaleControlsPref = new CheckBoxPreference(this);
+	        
+	        final CheckBoxPreference h48Pref = new CheckBoxPreference(this);
 	        h48Pref.setKey("hp48s");
 	        h48Pref.setDefaultValue(false);
 	        h48Pref.setTitle(R.string.hp48s);
 	        h48Pref.setSummary(R.string.hp48s_summary);
+	        h48Pref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+				
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue) {
+					bitmapSkinPref.setEnabled(!newValue.toString().equals("true"));
+					return true;
+				}
+			});
 	        inlinePrefCat.addPreference(h48Pref);
+	        boolean bitmapskin = getPreferenceManager().getSharedPreferences().getBoolean("bitmapskin", false);
+	        if (bitmapskin)
+	        	h48Pref.setEnabled(false);
 	        
 	        CheckBoxPreference savePref = new CheckBoxPreference(this);
 	        savePref.setKey("saveOnExit");
@@ -71,18 +87,23 @@ public class Settings extends PreferenceActivity {
 	        inlineDispPrefCat.setTitle(R.string.display_preferences);
 	        root.addPreference(inlineDispPrefCat);
 	        
-	        CheckBoxPreference hapticPref = new CheckBoxPreference(this);
-	        hapticPref.setKey("haptic");
-	        hapticPref.setTitle(R.string.haptic_feedback);
-	        hapticPref.setDefaultValue(true);
-	        inlineDispPrefCat.addPreference(hapticPref);
-	        
-	        CheckBoxPreference soundPref = new CheckBoxPreference(this);
-	        soundPref.setKey("sound");
-	        soundPref.setTitle(R.string.sound);
-	        soundPref.setSummary(R.string.sound_summary);
-	        soundPref.setDefaultValue(false);
-	        inlineDispPrefCat.addPreference(soundPref);
+	        bitmapSkinPref.setKey("bitmapskin");
+	        bitmapSkinPref.setTitle(R.string.bitmapSkin);
+	        bitmapSkinPref.setSummary(R.string.bitmapSkin_summary);
+	        bitmapSkinPref.setDefaultValue(false);
+	        inlineDispPrefCat.addPreference(bitmapSkinPref);
+	        bitmapSkinPref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+				
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue) {
+					h48Pref.setEnabled(!newValue.toString().equals("true"));
+					scaleControlsPref.setEnabled(newValue.toString().equals("true"));
+					return true;
+				}
+			});
+	        boolean hp48s = getPreferenceManager().getSharedPreferences().getBoolean("hp48s", false);
+	        if (hp48s)
+	        	bitmapSkinPref.setEnabled(false);
 	        
 	        CheckBoxPreference largeLCDPref = new CheckBoxPreference(this);
 	        largeLCDPref.setKey("large_width");
@@ -91,12 +112,12 @@ public class Settings extends PreferenceActivity {
 	        largeLCDPref.setDefaultValue(false);
 	        inlineDispPrefCat.addPreference(largeLCDPref);
 	        
-	        CheckBoxPreference scaleControlsPref = new CheckBoxPreference(this);
 	        scaleControlsPref.setKey("scale_buttons");
 	        scaleControlsPref.setTitle(R.string.scale_buttons);
 	        scaleControlsPref.setSummary(R.string.scale_buttons_summary);
 	        scaleControlsPref.setDefaultValue(false);
 	        inlineDispPrefCat.addPreference(scaleControlsPref);
+	        scaleControlsPref.setEnabled(bitmapskin);
 	        
 	        CheckBoxPreference fullScreenPref = new CheckBoxPreference(this);
 	        fullScreenPref.setKey("fullScreen");
@@ -115,7 +136,24 @@ public class Settings extends PreferenceActivity {
 	        listPref.setSummary(R.string.choose_contrast_value);
 	        inlineDispPrefCat.addPreference(listPref);
 	        
-	       
+	        PreferenceCategory inlineMiscPrefCat = new PreferenceCategory(this);
+	        inlineMiscPrefCat.setTitle(R.string.misc_preferences);
+	        root.addPreference(inlineMiscPrefCat);
+	        
+	        CheckBoxPreference hapticPref = new CheckBoxPreference(this);
+	        hapticPref.setKey("haptic");
+	        hapticPref.setTitle(R.string.haptic_feedback);
+	        hapticPref.setDefaultValue(true);
+	        inlineMiscPrefCat.addPreference(hapticPref);
+	        
+	        CheckBoxPreference soundPref = new CheckBoxPreference(this);
+	        soundPref.setKey("sound");
+	        soundPref.setTitle(R.string.sound);
+	        soundPref.setSummary(R.string.sound_summary);
+	        soundPref.setDefaultValue(false);
+	        inlineMiscPrefCat.addPreference(soundPref);
+	        
+	        
 	        
 	        PreferenceCategory portPrefCat = new PreferenceCategory(this);
 	        portPrefCat.setTitle(R.string.ramcards_preferences);
