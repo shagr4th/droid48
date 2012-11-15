@@ -285,10 +285,7 @@ jstring port1, jstring port2 )
 
 	jclass x48 = (*android_env)->GetObjectClass(env, android_callback);
 	LOGI("--x48 registered--");
-	refreshMainScreen = (*android_env)->GetMethodID(android_env, x48, "refreshMainScreen", "([S)V");
 	waitEvent = (*android_env)->GetMethodID(android_env, x48, "waitEvent", "()I");
-	refreshIcons = (*android_env)->GetMethodID(android_env, x48, "refreshIcons", "([Z)V");
-	emulatorReady = (*android_env)->GetMethodID(android_env, x48, "emulatorReady", "()V");
 	pauseEvent = (*android_env)->GetMethodID(android_env, x48, "pauseEvent", "()V");
 	LOGI("--methods registered--");
 }
@@ -296,8 +293,10 @@ jstring port1, jstring port2 )
 void
 Java_org_ab_x48_X48_stopHPEmulator( JNIEnv* env, jobject thiz )
 {
-	exit (0);
-	//exit_state = 0;
+	//exit (0);
+	LOGI("exit_state = 0");
+	exit_state = 0;
+	
 }
 
 void
@@ -376,7 +375,7 @@ sigset_t set;
 
  LOGI("emulate loop");
 
-(*android_env)->CallVoidMethod(android_env, android_callback, emulatorReady);
+//(*android_env)->CallVoidMethod(android_env, android_callback, emulatorReady);
   
   do {
 

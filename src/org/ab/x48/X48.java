@@ -24,6 +24,7 @@ import android.view.WindowManager.LayoutParams;
 public class X48 extends Activity {
     
 	private HPView mainView;
+	private boolean need_to_quit;
 	static final private int LOAD_ID = Menu.FIRST +1;
 	static final private int SAVE_ID = Menu.FIRST +2;
 	static final private int SETTINGS_ID = Menu.FIRST +5 ;
@@ -60,7 +61,7 @@ public class X48 extends Activity {
         
         thread = new EmulatorThread(this);
     	thread.start();
-    	
+    	mainView.resume();
     }
     
     public void checkPrefs() {
@@ -124,7 +125,7 @@ public class X48 extends Activity {
     public native int buttonReleased(int code);
     public native void registerClass(X48 instance, String rom_filename, String ram_filename, String conf_filename, String port1_filename, String port2_filename);
     public native int fillAudioData(short data []);
-    public native int fillScreenData(short data []);
+    public native int fillScreenData(short data [], boolean ann []);
     public native void flipScreen();
     public native int loadProg(String filename);
     public native void setBlankColor(short s);
@@ -180,9 +181,10 @@ public class X48 extends Activity {
        switch (item.getItemId()) {
        case RESET_ID:
 	    	  AssetUtil.copyAsset(getResources().getAssets(), true);
-	    	  stopHPEmulator();
+	    	  //stopHPEmulator();
 	           finish();
-	    	   return true;
+	           need_to_quit = true;
+	           return true;
 	       case SAVE_ID:
 	    	  saveState();
 	    	   return true;
@@ -402,7 +404,8 @@ private void managePort(int number, String value) {
 		stopHPEmulator();
 		if (mainView  != null)
 			mainView.unpauseEvent();
-		
+		if (need_to_quit)
+			System.exit(0);
 	}
 	
 	@Override

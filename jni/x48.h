@@ -148,10 +148,7 @@ extern disp_t   disp;
 
 extern JNIEnv *android_env;
 extern jobject android_callback;
-extern jmethodID refreshMainScreen;
 extern jmethodID waitEvent;
-extern jmethodID refreshIcons;
-extern jmethodID emulatorReady;
 extern jmethodID pauseEvent;
 
 extern Display *dpy;

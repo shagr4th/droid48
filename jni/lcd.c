@@ -161,8 +161,6 @@ unsigned short nibbles_short [16][8] =
 
 static unsigned char nibble_bits[16];
 
-jshortArray array;
-jbooleanArray ann_array;
 
 int flipable = 0;
 
@@ -199,19 +197,22 @@ Java_org_ab_x48_X48_flipScreen( JNIEnv*  env,
 
 jint
 Java_org_ab_x48_X48_fillScreenData( JNIEnv*  env,
-                                      jobject  this, jshortArray array) {
+                                      jobject  this, jshortArray array, jbooleanArray ann_array) {
 										 
 	if (flipable == 1)
 	{
 		
 		(*env)->SetShortArrayRegion(env, array, 0, ANDROID_BUF_HEADER_LENGTH, disp_buf_header_short);
 		(*env)->SetShortArrayRegion(env, array, ANDROID_BUF_HEADER_LENGTH, ANDROID_BUF_LENGTH, disp_buf_short);
+		
+		(*env)->SetBooleanArrayRegion(env, ann_array, 0, 6, ann_boolean);
+		
 		flipable = 0;
 		return 1;
 	}
 	return 0;
 }
-	
+	/*
 void
 #ifdef __FunctionProto__
 android_refresh_screen(void)
@@ -234,7 +235,7 @@ android_refresh_screen()
 		flipable = 0;
 	}
 	return;
-}
+}*/
 
 void
 #ifdef __FunctionProto__
@@ -598,34 +599,11 @@ draw_annunc()
   if (val == last_annunc_state)
     return;
   last_annunc_state = val;
-  /*for (i = 0; ann_tbl[i].bit; i++)
-    {
-      if ((ann_tbl[i].bit & val) == ann_tbl[i].bit)
-        {
-          XCopyPlane(dpy, ann_tbl[i].pixmap, disp.win, disp.gc, 0, 0,
-                     ann_tbl[i].width, ann_tbl[i].height,
-                     ann_tbl[i].x, ann_tbl[i].y, 1);
-        }
-      else
-        {
-          XClearArea(dpy, disp.win, ann_tbl[i].x, ann_tbl[i].y,
-                     ann_tbl[i].width, ann_tbl[i].height, 0);
-        }
-    }
-  refresh_icon();*/
-
-
-  if (!ann_array)
-	{
-		ann_array = (*android_env)->NewBooleanArray(android_env, 6);
+  
+	for (i = 0; ann_tbl[i].bit; i++) {
+		ann_boolean[i] = ((ann_tbl[i].bit & val) == ann_tbl[i].bit);
 	}
-	if(ann_array) {
-		for (i = 0; ann_tbl[i].bit; i++) {
-			ann_boolean[i] = ((ann_tbl[i].bit & val) == ann_tbl[i].bit);
-		}
-			(*android_env)->SetBooleanArrayRegion(android_env, ann_array, 0, 6, ann_boolean);
-			(*android_env)->CallVoidMethod(android_env, android_callback, refreshIcons, ann_array);
-	}
+
 	flipable = 1;
 	
 }
