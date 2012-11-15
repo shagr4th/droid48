@@ -42,6 +42,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	private X48 x48;
 	private Bitmap mainScreen;
 	private SurfaceHolder mSurfaceHolder;
+	private boolean surfaceValid;
 	private Bitmap  annImages [];
 	boolean ann [];
 	int ann_pos [] = { 62, 105, 152, 197, 244, 287 };
@@ -118,17 +119,13 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
         annImages [5] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann06);
         
         dm = x48.getResources().getDisplayMetrics();
-        scale = dm.scaledDensity;
         
         float minLength = dm.widthPixels;
         if (dm.heightPixels < minLength)
         	minLength = dm.heightPixels;
         
         screenLayout = x48.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
-        if (screenLayout >= 3) {
-        	// complètement arbitraire :\
-        	scale = scale * 1.75f;
-        }
+        scale = minLength / 320; // 1.0 for a HVGA screen, 2.0 for a 720p one
         
         paint = new Paint(); 
         paint.setStyle(Style.FILL); 
@@ -196,10 +193,10 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		if (y1 == 0)
 			return;
 		
-		int buttonMarginX = insertMargins?(int) (scale * 6):(int) (scale * 8);
+		int buttonMarginX = insertMargins?(int) (scale * 8):(int) (scale * 8);
 		int buttonMarginY = insertMargins?(int) (scale * 10):(int) (scale * 2);
 		
-		int marginX = insertMargins?(int) (scale * 2):(int) (scale * 1);
+		int marginX = insertMargins?(int) (scale * 1):(int) (scale * 1);
 		int marginY = insertMargins?(int) (scale * 1):(int) (scale * 1);
 		
 		int radius = (int) (5 * scale + 0.5f);
@@ -451,63 +448,62 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            				
 	            				Typeface asana = Typeface.createFromAsset(x48.getAssets(), "Asana-Math.ttf");
 	            				//asana = Typeface.create(asana, Typeface.BOLD);
-	            				Typeface regular = Typeface.createFromAsset(x48.getAssets(), "NewsCycle-Regular.ttf"); //Typeface.MONOSPACE; //DEFAULT_BOLD;
-	            				Typeface regularBold = Typeface.createFromAsset(x48.getAssets(), "NewsCycle-bold.ttf"); 
+	            				Typeface regularBold = Typeface.createFromAsset(x48.getAssets(), "ArchivoNarrow-Bold.ttf");
 	            				
-	            				int regularbuttonTextHeaderSizeDpi = 11;
-	            				int regularbuttonTextSizeDpi = 17;
+	            				int regularbuttonTextHeaderSizeDpi = (int) (11f * scale);
+	            				int regularbuttonTextSizeDpi = (int) (17f * scale);
 	            				
-	            				int asanabuttonTextHeaderSizeDpi = 15;
-	            				int asanabuttonTextSizeDpi = 21;
+	            				int asanabuttonTextHeaderSizeDpi = (int) (15f * scale);
+	            				int asanabuttonTextSizeDpi = (int) (21f * scale );
 	            				
 	            				boolean antialias = true;
 	            				
 	            				asanaHeadGreenPaint = new Paint();
 	            				asanaHeadGreenPaint.setTypeface(asana);
 	            				asanaHeadGreenPaint.setAntiAlias(antialias);
-	            				asanaHeadGreenPaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				asanaHeadGreenPaint.setTextSize(asanabuttonTextHeaderSizeDpi);
 	            				asanaHeadGreenPaint.setColor(topRightColor);
 	            				
 	            				asanaHeadPurplePaint = new Paint();
 	            				asanaHeadPurplePaint.setTypeface(asana);
 	            				asanaHeadPurplePaint.setAntiAlias(antialias);
-	            				asanaHeadPurplePaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				asanaHeadPurplePaint.setTextSize(asanabuttonTextHeaderSizeDpi);
 	            				asanaHeadPurplePaint.setColor(topLeftColor);
 	            				
 	            				asanaWhitePaint = new Paint();
 	            				asanaWhitePaint.setTypeface(asana);
 	            				asanaWhitePaint.setAntiAlias(antialias);
-	            				asanaWhitePaint.setTextSize(asanabuttonTextSizeDpi * scale + 0.5f);
+	            				asanaWhitePaint.setTextSize(asanabuttonTextSizeDpi);
 	            				asanaWhitePaint.setColor(Color.WHITE);
 	            				
 	            				asanaFootWhitePaint = new Paint();
 	            				asanaFootWhitePaint.setTypeface(asana);
 	            				asanaFootWhitePaint.setAntiAlias(antialias);
-	            				asanaFootWhitePaint.setTextSize(asanabuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				asanaFootWhitePaint.setTextSize(asanabuttonTextHeaderSizeDpi);
 	            				asanaFootWhitePaint.setColor(Color.WHITE);
 	            				
 	            				regularHeadGreenPaint = new Paint();
-	            				regularHeadGreenPaint.setTypeface(regular);
+	            				regularHeadGreenPaint.setTypeface(regularBold);
 	            				regularHeadGreenPaint.setAntiAlias(antialias);
-	            				regularHeadGreenPaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				regularHeadGreenPaint.setTextSize(regularbuttonTextHeaderSizeDpi);
 	            				regularHeadGreenPaint.setColor(topRightColor);
 	            				
 	            				regularHeadPurplePaint = new Paint();
-	            				regularHeadPurplePaint.setTypeface(regular);
+	            				regularHeadPurplePaint.setTypeface(regularBold);
 	            				regularHeadPurplePaint.setAntiAlias(antialias);
-	            				regularHeadPurplePaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				regularHeadPurplePaint.setTextSize(regularbuttonTextHeaderSizeDpi);
 	            				regularHeadPurplePaint.setColor(topLeftColor);
 	            				
 	            				regularWhitePaint = new Paint();
 	            				regularWhitePaint.setTypeface(regularBold);
 	            				regularWhitePaint.setAntiAlias(antialias);
-	            				regularWhitePaint.setTextSize(regularbuttonTextSizeDpi * scale + 0.5f);
+	            				regularWhitePaint.setTextSize(regularbuttonTextSizeDpi);
 	            				regularWhitePaint.setColor(Color.WHITE);
 	            				
 	            				regularFootWhitePaint = new Paint();
-	            				regularFootWhitePaint.setTypeface(regular);
+	            				regularFootWhitePaint.setTypeface(regularBold);
 	            				regularFootWhitePaint.setAntiAlias(antialias);
-	            				regularFootWhitePaint.setTextSize(regularbuttonTextHeaderSizeDpi * scale + 0.5f);
+	            				regularFootWhitePaint.setTextSize(regularbuttonTextHeaderSizeDpi);
 	            				regularFootWhitePaint.setColor(Color.WHITE);
 	            				
 	            				buttonBorderPaint.setColor(Color.BLACK);
@@ -1090,15 +1086,17 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.i("x48", "Surface created");
-		if (drawThread == null) {
-			drawThread = new Thread(this);
-			drawThread.start();
-		}
+		
+		surfaceValid = true;
+		drawThread = new Thread(this);
+		drawThread.start();
+		
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		Log.i("x48", "Surface destroyed");
+		surfaceValid = false;
 	}
 
 	@Override
@@ -1126,8 +1124,8 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	public void run() {
 		Log.i("x48", "drawing thread started");
 		x48.flipScreen();
-		while (true) {
-			if (needFlip || x48.fillScreenData(buf) == 1) {
+		while (surfaceValid) {
+			if (needFlip || x48.fillScreenData(buf, ann) == 1) {
 				needFlip = false;
 				refreshMainScreen(buf);
 			}
@@ -1137,7 +1135,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-			} while (pause);
+			} while (pause && surfaceValid);
 		}
 		//Log.i("x48", "drawing thread stopped");
 	}
