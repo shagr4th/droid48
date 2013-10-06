@@ -4,6 +4,7 @@
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:name=".X48"
                   android:label="@string/app_name"
+                  android:theme="@style/Theme.AppCompat"
                   android:configChanges="keyboardHidden|orientation" android:launchMode="singleTop"> <!-- |screenSize -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -15,7 +16,7 @@
 </activity>
 <activity android:name=".Settings" android:label="@string/choose_contrast_value"></activity>
 </application>
-    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="10"/>
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="15"/>
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:resizeable="true" android:smallScreens="true" android:xlargeScreens="true"></supports-screens>
 
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
