@@ -51,7 +51,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	protected boolean needFlip;
 	private short buf [];
 	private short audiobuf [];
-	private int currentOrientation;
+	int currentOrientation;
 	private boolean multiTouch;
 	private AudioTrack track;
 	private TimerTask audioTask;
@@ -86,6 +86,11 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
     int topLeftColor;
     int topRightColor;
     
+    Paint systemOptionsPaint;
+    int systemOptions_x;
+    int systemOptions_y;
+    boolean systemOptionDisplayed = true;
+    
     Paint buttonBorderPaint = new Paint();
     
     String topLefts [] = new String [MAX_TOUCHES];
@@ -96,42 +101,42 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	public HPView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setFocusable(true);
-        setFocusableInTouchMode(true);
+		setFocusableInTouchMode(true);
 		x48 = ((X48) context);
 		multiTouch = Wrapper.supportsMultitouch(x48);
 		mSurfaceHolder = getHolder();
 		mSurfaceHolder.addCallback(this);
-        mainScreen = Bitmap.createBitmap(262, 14+128, Bitmap.Config.RGB_565);
-        queuedCodes = new Vector<Integer>();
-        ann = new boolean [6];
-        buf = new short [(14+128)*262];
-        audiobuf = new short [44100]; // 1s worth
-        track = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, 16384, AudioTrack.MODE_STREAM);
-        annImages = new Bitmap [6];
-        updateContrast();
-        matrixScreen = new Matrix();
-        matrixBack= new Matrix();
-        annImages [0] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann01);
-        annImages [1] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann02);
-        annImages [2] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann03);
-        annImages [3] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann04);
-        annImages [4] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann05);
-        annImages [5] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann06);
-        
-        dm = x48.getResources().getDisplayMetrics();
-        
-        float minLength = dm.widthPixels;
-        if (dm.heightPixels < minLength)
-        	minLength = dm.heightPixels;
-        
-        screenLayout = x48.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
-        scale = minLength / 320; // 1.0 for a HVGA screen, 2.0 for a 720p one
-        
-        paint = new Paint(); 
-        paint.setStyle(Style.FILL); 
-        paint.setARGB(128, 250, 250, 250); 
+		mainScreen = Bitmap.createBitmap(262, 14+128, Bitmap.Config.RGB_565);
+		queuedCodes = new Vector<Integer>();
+		ann = new boolean [6];
+		buf = new short [(14+128)*262];
+		audiobuf = new short [44100]; // 1s worth
+		track = new AudioTrack(AudioManager.STREAM_MUSIC, 44100, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, 16384, AudioTrack.MODE_STREAM);
+		annImages = new Bitmap [6];
+		updateContrast();
+		matrixScreen = new Matrix();
+		matrixBack= new Matrix();
+		annImages [0] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann01);
+		annImages [1] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann02);
+		annImages [2] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann03);
+		annImages [3] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann04);
+		annImages [4] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann05);
+		annImages [5] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann06);
+		
+		dm = x48.getResources().getDisplayMetrics();
+		
+		float minLength = dm.widthPixels;
+		if (dm.heightPixels < minLength)
+			minLength = dm.heightPixels;
+		
+		screenLayout = x48.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+		scale = minLength / 320; // 1.0 for a HVGA screen, 2.0 for a 720p one
+		
+		paint = new Paint(); 
+		paint.setStyle(Style.FILL); 
+		paint.setARGB(128, 250, 250, 250); 
 
-        screenPaint = null;
+		screenPaint = null;
 		screenPaint = new Paint();
 		
 		audioTask = new TimerTask() {
@@ -152,14 +157,14 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	
 	public void updateContrast() {
 		SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(x48);
-        String cString = mPrefs.getString("contrast", "1");
-        int c = Integer.parseInt(cString);
-        if (c < 0)
-        	c = 0;
-        if (c > 2)
-        	c = 2;
-        setContrast(0.5 * c);
-        //x48.flipScreen();
+		String cString = mPrefs.getString("contrast", "1");
+		int c = Integer.parseInt(cString);
+		if (c < 0)
+			c = 0;
+		if (c > 2)
+			c = 2;
+		setContrast(0.5 * c);
+		//x48.flipScreen();
 	}
 	
 	private void setContrast(double contrast_factor) {
@@ -254,57 +259,93 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 			
 		}
 		
+		int tlWidth  = 0;
+		int tlHeight = 0;
+		int trWidth  = 0;
+		int trHeight = 0;
+		
+		Paint HeadPurplePaint = regularHeadPurplePaint;
 		if (drawHeadersAndFooters && topLeft != null) {
 			
-			Paint HeadPurplePaint = regularHeadPurplePaint;
+			//Paint HeadPurplePaint = regularHeadPurplePaint;
 			if (topLeft.startsWith("$")) {
 				topLeft = topLeft.substring(1);
 				HeadPurplePaint = asanaHeadPurplePaint;
 			}
 			
-			boolean centered = false;
+			//boolean centered = false;
+			//if (topLeft.startsWith("/")) {
+			//    topLeft = topLeft.substring(1);
+			//    centered = true;
+			//}
 			if (topLeft.startsWith("/")) {
 				topLeft = topLeft.substring(1);
-				centered = true;
 			}
 			
 			Rect bounds = new Rect();
 			HeadPurplePaint.getTextBounds(topLeft, 0, topLeft.length(), bounds);
-			int width = bounds.width();
+			//int width = bounds.width();
+			tlWidth = bounds.width();
 			HeadPurplePaint.getTextBounds("A", 0, 1, bounds);
-			int height = bounds.height();
+			//int height = bounds.height();
+			tlHeight = bounds.height();
+
+			//int cX = centered?(x0 + ((x1 - x0 - width)/2)):x0;
 			
-			int cX = centered?(x0 + ((x1 - x0 - width)/2)):x0;
-			
-			backCanvas.drawText(topLeft, cX, height + y0, HeadPurplePaint);
+			//backCanvas.drawText(topLeft, cX, height + y0, HeadPurplePaint);
 			
 		}
 		
+		Paint HeadGreenPaint = regularHeadGreenPaint;
 		if (drawHeadersAndFooters && topRight != null) {
 			
-			Paint HeadGreenPaint = regularHeadGreenPaint;
+			//Paint HeadGreenPaint = regularHeadGreenPaint;
 			if (topRight.startsWith("$")) {
 				topRight = topRight.substring(1);
 				HeadGreenPaint = asanaHeadGreenPaint;
 			}
 			
-			boolean centered = false;
+			//boolean centered = false;
+			//if (topRight.startsWith("/")) {
+			//    topRight = topRight.substring(1);
+			//    centered = true;
+			//}
 			if (topRight.startsWith("/")) {
 				topRight = topRight.substring(1);
-				centered = true;
 			}
 			
 			Rect bounds = new Rect();
 			HeadGreenPaint.getTextBounds(topRight, 0, topRight.length(), bounds);
-			int width = bounds.width();
+			//int width = bounds.width();
+			trWidth = bounds.width();
 			HeadGreenPaint.getTextBounds("A", 0, 1, bounds);
-			int height = bounds.height();
+			//int height = bounds.height();
+			trHeight = bounds.height();
 			
-			int cX = centered?(x0 + ((x1 - x0 - width)/2)):(x1 - width);
+			//int cX = centered?(x0 + ((x1 - x0 - width)/2)):(x1 - width);
 			
-			backCanvas.drawText(topRight, cX, height + y0, HeadGreenPaint);
+			//backCanvas.drawText(topRight, cX, height + y0, HeadGreenPaint);
 			
 		}
+
+
+		int pad = 0;
+		if ((tlWidth > 0) && (trWidth > 0)) {
+			// There is text in top-left and top-right so we calculate a
+			// suitable width for padding to separate them.
+			pad = (x1 - x0 - (tlWidth + trWidth)) / 3;
+		}
+			
+		int totalWidth = tlWidth + trWidth + pad;
+
+		int cX = x0 + ((x1 - x0 - totalWidth)/2);
+		if (tlWidth > 0) {
+			backCanvas.drawText(topLeft,  cX                  , tlHeight + y0, HeadPurplePaint);
+		}
+		if (trWidth > 0) {
+			backCanvas.drawText(topRight, cX + tlWidth + pad, trHeight + y0, HeadGreenPaint);
+		}
+
 		
 		if (drawHeadersAndFooters && bottomRight != null) {
 			
@@ -320,15 +361,14 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	public void refreshMainScreen(short data []) {
 		Canvas c = null;
 		try {
-            c = mSurfaceHolder.lockCanvas(null);
-            synchronized (mSurfaceHolder) {
-            	boolean land = currentOrientation == Configuration.ORIENTATION_LANDSCAPE;
-            	
-            	if (c != null) {
-            		
-	            		if (backBuffer == null) {
-	            			
-	            			if (x48.isBitmapSkin()) {
+			c = mSurfaceHolder.lockCanvas(null);
+			synchronized (mSurfaceHolder) {
+				boolean land = currentOrientation == Configuration.ORIENTATION_LANDSCAPE;
+				
+				if (c != null) {
+					
+						if (backBuffer == null) {
+							if (x48.isBitmapSkin()) {
 	            				BitmapFactory.Options opts = new BitmapFactory.Options();
 	            		        opts.inScaled = false;
 	            		        
@@ -401,12 +441,12 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            	    	        		null, null, null, null, null, null,
 	            	    	        		"RAD", null, null, null, null, "PREV",
 	            	    	        		"UP", "DEF", "NUM", "/PICTURE", "/VIEW", "/SWAP",
-	            	    	        		" ASIN", " ACOS", " ATAN", " x\u00B2", " 10\u207F", " e\u207F", 
+	            	    	        		"ASIN", "ACOS", "ATAN", "x\u00B2", "10\u207F", "e\u207F", 
 	            	    	        		"EQUATION", "EDIT", "PURG", "/CLEAR", "/DROP",
-	            	    	        		"USER", null, null, null, " ( )",
-	            	    	        		null, null, null, null, " [ ]",
+	            	    	        		"USER", null, null, null, "( )",
+	            	    	        		null, null, null, null, "[ ]",
 	            	    	        		null, null, null, null, "$\u00AB \u00BB",
-	            	    	        		" CONT", " =", " ,", " \u03C0", " { }",
+	            	    	        		"CONT", "=", ",", "\u03C0", "{ }",
 	            	    	        		null, null, null, null, null, null
 	            	    	        		};
 	            	    	        
@@ -414,12 +454,12 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            	    	        		null, null, null, null, null, null,
 	            	    	        		"POLAR", "/CHARS", "/MODES", "/MEMORY", "/STACK", "MENU",
 	            	    	        		"HOME", "RCL", "UNDO", null, null, null,
-	            	    	        		"\u2202 ", "\u222B ", "\u2211 ", "\u207F\u221Ay ", "LOG ", "LN ",
+	            	    	        		"\u2202", "\u222B", "\u2211", "\u207F\u221Ay", "LOG", "LN",
 	            	    	        		"MATRIX", "CMD", "ARG", null, null,
-	            	    	        		"ENTRY", "/SOLVE", "/PLOT", "/SYMBOLIC", "# ",
-	            	    	        		null, "/TIME", "/STAT", "/UNITS", "_ ",
-	            	    	        		null, "/I/O", "/LIBRARY", "/EQ LIB", "\" \" ",
-	            	    	        		"OFF ", "\u2192 ", "$\u21B5 ", "$\u2221 ", ": : ",
+	            	    	        		"ENTRY", "/SOLVE", "/PLOT", "/SYMBOLIC", "#",
+	            	    	        		null, "/TIME", "/STAT", "/UNITS", "_",
+	            	    	        		null, "/I/O", "/LIBRARY", "/EQ LIB", "\" \"",
+	            	    	        		"OFF", "\u2192", "$\u21B5", "$\u2221", ": :",
 	            	    	        		null, null, null, null, null, null
 	            	    	        		};
 	            	    	        
@@ -481,6 +521,12 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            				asanaFootWhitePaint.setAntiAlias(antialias);
 	            				asanaFootWhitePaint.setTextSize(asanabuttonTextHeaderSizeDpi);
 	            				asanaFootWhitePaint.setColor(Color.WHITE);
+	            				
+	            				systemOptionsPaint = new Paint();
+	            				systemOptionsPaint.setTypeface(regularBold);
+	            				systemOptionsPaint.setAntiAlias(antialias);
+	            				systemOptionsPaint.setTextSize(regularbuttonTextHeaderSizeDpi);
+	            				systemOptionsPaint.setColor(Color.BLACK);
 	            				
 	            				regularHeadGreenPaint = new Paint();
 	            				regularHeadGreenPaint.setTypeface(regularBold);
@@ -549,6 +595,9 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 								regular_key_height = usable_h / (3f + 11f/18f);
 								menu_key_height = regular_key_height*11/18;
 							}
+							
+							systemOptions_x = lcd_pos_x;
+							systemOptions_y = (int) (4*lcd_ratio);
 							
 							icons_coords = new int [][] { { lcd_pos_x, 0 }, {(int)(lcd_pos_x+21*lcd_ratio), 0}, {(int)(lcd_pos_x+45*lcd_ratio), 0},
 									{(int)(lcd_pos_x+67*lcd_ratio), 0}, {(int)(lcd_pos_x+91*lcd_ratio), 0}, {(int)(lcd_pos_x+112*lcd_ratio), 0} };
@@ -866,19 +915,25 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 							if (ann[i])
 								c.drawBitmap(annImages[i], icons_coords[i][0], icons_coords[i][1], null);
 						}
-            		
-            	} else {
-            		//Log.i("x48", "null canvas !");
-            	}
-            }
-        } finally {
-            // do this in a finally so that if an exception is thrown
-            // during the above, we don't leave the Surface in an
-            // inconsistent state
-            if (c != null) {
-                mSurfaceHolder.unlockCanvasAndPost(c);
-            }
-        }
+						
+						
+						if (systemOptionDisplayed) {
+							c.drawText(getContext().getString(R.string.show_menu), systemOptions_x, systemOptions_y, systemOptionsPaint);
+						}
+						
+					
+				} else {
+					//Log.i("x48", "null canvas !");
+				}
+			}
+		} finally {
+			// do this in a finally so that if an exception is thrown
+			// during the above, we don't leave the Surface in an
+			// inconsistent state
+			if (c != null) {
+				mSurfaceHolder.unlockCanvasAndPost(c);
+			}
+		}
 		//Log.i("x48", "data: " + data.length);
 	}
 
@@ -890,7 +945,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 			int actionCode = action & MotionEvent.ACTION_MASK;
 			int code = -1;
 			int pointerID = 0;
-
+			systemOptionDisplayed = false;
 			if (multiTouch) {
 				if( actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_UP ||
 						actionCode == MotionEvent.ACTION_POINTER_DOWN || actionCode == MotionEvent.ACTION_POINTER_UP ) {
@@ -919,14 +974,8 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            	}
 		            }	            
 	            if (code == -1 && actionCode == MotionEvent.ACTION_DOWN ) {
-	            	/*if (x >= menu_button[0] && x <= menu_button[2] && y >= menu_button[1] && y <= menu_button[3]) {
-	            		// call menu
-	            	} else if (x >= hidemenu_button[0] && x <= hidemenu_button[2] && y >= hidemenu_button[1] && y <= hidemenu_button[3]) {
-	            		// hide menu
-	            	} else*/ if (currentOrientation != Configuration.ORIENTATION_LANDSCAPE ) {
-	            		((X48) getContext()).changeKeybLite();
-	            		return true;
-	            	}
+	            	((X48) getContext()).openOptionsMenu();
+	            	return true;
 	            }
 	       
 				if (code > -1) {
@@ -949,7 +998,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	                }
 	            }
 	            if (code == -1 && action == MotionEvent.ACTION_DOWN && currentOrientation != Configuration.ORIENTATION_LANDSCAPE ) {
-	            	((X48) getContext()).changeKeybLite();
+	            	((X48) getContext()).openOptionsMenu();
 	            	return true;
 	            }
 	       
@@ -959,8 +1008,8 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 				}
 			}
 		}
-        
-        return false;
+		
+		return false;
 	}
 	
 	private boolean keybLite = false;
@@ -1101,9 +1150,9 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 
 	@Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
-        if (!hasWindowFocus) {
-        	//mRun = false;
-        }
+		if (!hasWindowFocus) {
+			//mRun = false;
+		}
     }
 	
 	public void refreshIcons(boolean ann []) {
