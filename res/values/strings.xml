@@ -46,7 +46,7 @@
 <string name="large_width">Large LCD screen</string>
 <string name="large_width_summary">Portrait mode only</string>
 <string name="show_lite_keyb">Minimal controls</string>
-<string name="show_lite_keyb_summary">Also, easy shortcut: touch the LCD</string>
+<string name="show_lite_keyb_summary">You can also enable it in the menu</string>
 <string name="full_screen">Hide the status bar</string>
 <string name="full_screen_summary">Full screen mode</string>
 <string name="scale_buttons">Autoscale touch controls</string>
@@ -59,4 +59,5 @@
 <string name="hp48s_summary">Emulate an HP48S (Need App Restart !)</string>
 <string name="bitmapSkin">HP48 Bitmap Skin</string>
 <string name="bitmapSkin_summary">Restore the previous bitmap skin (48G mode only !)</string>
+<string name="show_menu">Touch the screen to show system options</string>
 </resources>

@@ -30,6 +30,7 @@ public class X48 extends Activity {
 	static final private int SETTINGS_ID = Menu.FIRST +5 ;
 	static final private int QUIT_ID = Menu.FIRST +3 ;
 	static final private int RESET_ID = Menu.FIRST +4 ;
+	static final private int KEYBLITE_ID = Menu.FIRST +6 ;
 	
 	static final private int ROM_ID = 123;
 	
@@ -63,6 +64,8 @@ public class X48 extends Activity {
     	thread.start();
     	mainView.resume();
     }
+    
+
     
     public void checkPrefs() {
     	SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -162,6 +165,8 @@ public class X48 extends Activity {
        // given them shortcuts.
        //menu.add(0, RESET_ID, 0, R.string.reset);
        
+       if (mainView.currentOrientation == Configuration.ORIENTATION_PORTRAIT)
+    	   menu.add(0, KEYBLITE_ID, 0, R.string.show_lite_keyb);
        menu.add(0, SAVE_ID, 0, R.string.save_state);
        menu.add(0, LOAD_ID, 0, R.string.load_prog);
        menu.add(0, SETTINGS_ID, 0, R.string.settings);
@@ -179,6 +184,9 @@ public class X48 extends Activity {
    @Override
    public boolean onMenuItemSelected(int featureId, MenuItem item) {
        switch (item.getItemId()) {
+       case KEYBLITE_ID:
+    	   	changeKeybLite();
+    	   	return true;
        case RESET_ID:
 	    	  AssetUtil.copyAsset(getResources().getAssets(), true);
 	    	  //stopHPEmulator();
