@@ -43,9 +43,9 @@ public class X48 extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i("x48", "starting activity");
-        AssetUtil.copyAsset(getResources().getAssets(), false);
+        AssetUtil.copyAsset(this, getResources().getAssets(), false);
         readyToGo() ;
-        if (!AssetUtil.isFilesReady()) {
+        if (!AssetUtil.isFilesReady(this)) {
         	showDialog(DIALOG_ROM_KO);
         }
     }
@@ -126,7 +126,7 @@ public class X48 extends Activity {
     public native void stopHPEmulator();
     public native int buttonPressed(int code);
     public native int buttonReleased(int code);
-    public native void registerClass(X48 instance, String rom_filename, String ram_filename, String conf_filename, String port1_filename, String port2_filename);
+    public native void registerClass(X48 instance, String path, String rom_filename, String ram_filename, String conf_filename, String port1_filename, String port2_filename);
     public native int fillAudioData(short data []);
     public native int fillScreenData(short data [], boolean ann []);
     public native void flipScreen();
@@ -188,7 +188,7 @@ public class X48 extends Activity {
     	   	changeKeybLite();
     	   	return true;
        case RESET_ID:
-	    	  AssetUtil.copyAsset(getResources().getAssets(), true);
+	    	  AssetUtil.copyAsset(this, getResources().getAssets(), true);
 	    	  //stopHPEmulator();
 	           finish();
 	           need_to_quit = true;
@@ -345,7 +345,7 @@ public class X48 extends Activity {
 
 private void managePort(int number, String value) {
 	   int size = Integer.parseInt(value);
-	   File f = AssetUtil.getSDDir();
+	   File f = AssetUtil.getSDDir(this);
 	   if (f != null) {
 		   boolean change = false;
 		   File port = new File(f, "port" + number);
@@ -423,7 +423,10 @@ private void managePort(int number, String value) {
 
 
 	public void registerClass() {
-		registerClass(this, hp48s?"roms":"rom", hp48s?"rams":"ram", hp48s?"hp48s":"hp48",
+		String files_path = AssetUtil.getSDDir(this).getAbsolutePath();
+		if (!files_path.endsWith("/"))
+			files_path = files_path + "/";
+		registerClass(this, files_path, hp48s?"roms":"rom", hp48s?"rams":"ram", hp48s?"hp48s":"hp48",
 				hp48s?"port1s":"port1", hp48s?"port2s":"port2");
 	}
 

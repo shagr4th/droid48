@@ -5,30 +5,40 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import android.util.Log;
 
 public class AssetUtil {
 	
-	public static void copyAsset(AssetManager am, boolean force) {
+	public static void copyAsset(Context context, AssetManager am, boolean force) {
+		File newDir = context.getExternalFilesDir(null);
 		File sd = Environment.getExternalStorageDirectory();
-		if (sd.exists() && sd.isDirectory()) {
+		if (sd.exists() && sd.isDirectory() && newDir.exists() && newDir.isDirectory()) {
 			File hpDir = new File(sd, ".hp48");
-			copyAsset(am, hpDir.exists() || hpDir.mkdir(), force);
-		} else {
-			copyAsset(am, false, force);
+			if (hpDir.exists()) {
+				File allFiles [] = hpDir.listFiles();
+				if (allFiles != null && allFiles.length > 0) {
+					Log.i("x48", "Moving x48 files from the old dir " + sd.getAbsolutePath() + " to the proper one :");
+					for(File file:allFiles) {
+						File newFile = new File(newDir, file.getName());
+						Log.i("x48", "Moving " + file.getAbsolutePath() + " to " + newFile);
+						file.renameTo(newFile);
+					}
+				}
+				Log.i("x48", "Deleting old directory");
+				hpDir.delete();
+			}
 		}
+		copyAsset(am, newDir, force);
 	}
 	
-	public static File getSDDir() {
-		File hpDir = new File(Environment.getExternalStorageDirectory(), ".hp48");
-		if (hpDir.exists())
-			return hpDir;
-		return null;
+	public static File getSDDir(Context context) {
+		return context.getExternalFilesDir(null);
 	}
 	
-	public static void copyAsset(AssetManager am, boolean sd, boolean force) {
+	private static void copyAsset(AssetManager am, File rep, boolean force) {
 		try {
 			String assets[] = am.list( "" );
 			for( int i = 0 ; i < assets.length ; i++ ) {
@@ -49,7 +59,6 @@ public class AssetUtil {
 					required = 262144;
 				//boolean SKUNK = assets[i].equals("SKUNK");
 				if (hp48 || rom || ram || hp48s || roms || rams) {
-					File rep = sd?new File(Environment.getExternalStorageDirectory(), ".hp48"):new File(Environment.getDataDirectory(), "data/org.ab.x48");
 					File fout = new File(rep, assets[i]);
 					if (!fout.exists() || fout.length() == 0 || (required > 0 && fout.length() != required) || force) {
 						Log.i("x48", "Overwriting " + assets[i]);
@@ -70,12 +79,10 @@ public class AssetUtil {
 		}
 	}
 	
-	public static boolean isFilesReady() {
-		File hpDir = new File(Environment.getExternalStorageDirectory(), ".hp48");
+	public static boolean isFilesReady(Context context) {
+		File hpDir = context.getExternalFilesDir(null);
 		if (!hpDir.exists() || !hpDir.isDirectory()) {
-			hpDir = new File(Environment.getDataDirectory(), "data/org.ab.x48");
-			if (!hpDir.exists() || !hpDir.isDirectory())
-				return false;
+			return false;
 		}
 		File hp = new File(hpDir, "hp48");
 		File rom = new File(hpDir, "rom");

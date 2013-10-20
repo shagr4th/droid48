@@ -245,6 +245,7 @@ printf("%s\n", nl_langinfo(CODESET));*/
   return 0;
 }
 
+char    files_path   [256];
 char    rom_filename [256];
 char    ram_filename [256];
 char    conf_filename [256];
@@ -252,14 +253,18 @@ char    port1_filename [256];
 char    port2_filename [256];
 
 void
-Java_org_ab_x48_X48_registerClass( JNIEnv* env, jobject caller, jobject callback, jstring rom, jstring ram, jstring conf,
+Java_org_ab_x48_X48_registerClass( JNIEnv* env, jobject caller, jobject callback, jstring path, jstring rom, jstring ram, jstring conf,
 jstring port1, jstring port2 )
 {
 	LOGI("--registerClass--");
 	android_env = env;
 	android_callback = (*android_env)->NewGlobalRef(env, callback);
+	
+	const char * fp = (*android_env)->GetStringUTFChars(env, path, NULL);
+	strcpy(files_path, fp);
+	(*android_env)->ReleaseStringUTFChars(env, path, fp);
 
-	const char * fp = (*android_env)->GetStringUTFChars(env, rom, NULL);
+	fp = (*android_env)->GetStringUTFChars(env, rom, NULL);
 	strcpy(rom_filename, fp);
 	(*android_env)->ReleaseStringUTFChars(env, rom, fp);
 

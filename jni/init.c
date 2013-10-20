@@ -1156,13 +1156,7 @@ read_files()
   FILE          *fp;
  
 
- FILE          *sd;
-	if (NULL == (sd = fopen("/sdcard/.hp48/", "rw"))) {
-		strcpy(path, "/data/data/org.ab.x48/");
-		
-	}
-	else
-		strcpy(path, "/sdcard/.hp48/");
+	strcpy(path, files_path);
 
   //get_home_directory(path);
  LOGI("path: %s", path); 
@@ -1617,14 +1611,7 @@ write_files()
   FILE *fp;
 
   make_dir = 0;
-  //get_home_directory(path);
-  FILE          *sd;
-	if (NULL == (sd = fopen("/sdcard/.hp48/", "rw"))) {
-		strcpy(path, "/data/data/org.ab.x48/");
-		//fclose(sd);
-	}
-	else
-		strcpy(path, "/sdcard/.hp48/");
+	strcpy(path, files_path);
 
   if (stat(path, &st) == -1)
     {
@@ -1814,13 +1801,7 @@ init_emulator()
 
   char           path[1024];
 
-    FILE          *sd;
-  	if (NULL == (sd = fopen("/sdcard/.hp48/", "rw"))) {
-  		strcpy(path, "/data/data/org.ab.x48/");
-
-  	}
-  	else
-  		strcpy(path, "/sdcard/.hp48/");
+    strcpy(path, files_path);
 
 
     strcat(path, rom_filename);
