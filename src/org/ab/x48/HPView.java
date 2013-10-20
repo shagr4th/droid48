@@ -525,7 +525,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            				systemOptionsPaint = new Paint();
 	            				systemOptionsPaint.setTypeface(regularBold);
 	            				systemOptionsPaint.setAntiAlias(antialias);
-	            				systemOptionsPaint.setTextSize(regularbuttonTextHeaderSizeDpi);
+	            				systemOptionsPaint.setTextSize((int) (12f * scale));
 	            				systemOptionsPaint.setColor(Color.BLACK);
 	            				
 	            				regularHeadGreenPaint = new Paint();
