@@ -355,12 +355,14 @@ private void managePort(int number, String value) {
 		   if (size == 0) {
 			   if (port.exists()) {
 				   port.delete();
+				   Log.i("x48", "Deleting port" + number + " file.");
 				   change = true;
 			   }
 		   } else {
 			   if (port.exists() && port.length() == 1024 * size) {
 				   
 			   } else {
+				   Log.i("x48", "Port" + number + " file does not exists or is incomplete. Writing a blank file.");
 				   byte data [] = new byte [1024];
 				   for(int i=0;i<data.length;i++)
 					   data[i] = 0;
