@@ -49,6 +49,26 @@ public class X48 extends Activity {
         	showDialog(DIALOG_ROM_KO);
         }
     }
+    
+    // http://stackoverflow.com/questions/9996333/openoptionsmenu-function-not-working-in-ics
+    // todo: really need a proper system button
+    @Override
+    public void openOptionsMenu() {
+
+        Configuration config = getResources().getConfiguration();
+
+        if((config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) 
+                > Configuration.SCREENLAYOUT_SIZE_LARGE) {
+
+            int originalScreenLayout = config.screenLayout;
+            config.screenLayout = Configuration.SCREENLAYOUT_SIZE_LARGE;
+            super.openOptionsMenu();
+            config.screenLayout = originalScreenLayout;
+
+        } else {
+            super.openOptionsMenu();
+        }
+    }
  
     public void readyToGo() {
     	hp48s = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("hp48s", false);
