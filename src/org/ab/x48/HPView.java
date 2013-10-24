@@ -918,7 +918,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 						
 						
 						if (systemOptionDisplayed) {
-							c.drawText(getContext().getString(R.string.show_menu), systemOptions_x, systemOptions_y, systemOptionsPaint);
+							c.drawText(x48.getString(R.string.show_menu), systemOptions_x, systemOptions_y, systemOptionsPaint);
 						}
 						
 					
@@ -974,7 +974,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            	}
 		            }	            
 	            if (code == -1 && actionCode == MotionEvent.ACTION_DOWN ) {
-	            	((X48) getContext()).openOptionsMenu();
+	            	x48.openOptionsMenu();
 	            	return true;
 	            }
 	       
@@ -998,7 +998,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	                }
 	            }
 	            if (code == -1 && action == MotionEvent.ACTION_DOWN && currentOrientation != Configuration.ORIENTATION_LANDSCAPE ) {
-	            	((X48) getContext()).openOptionsMenu();
+	            	x48.openOptionsMenu();
 	            	return true;
 	            }
 	       
