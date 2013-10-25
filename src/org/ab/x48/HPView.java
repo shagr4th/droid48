@@ -368,6 +368,16 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 				if (c != null) {
 					
 						if (backBuffer == null) {
+							
+							Typeface regularBold = Typeface.createFromAsset(x48.getAssets(), "ArchivoNarrow-Bold.ttf");
+							boolean antialias = true;
+            				
+							systemOptionsPaint = new Paint();
+            				systemOptionsPaint.setTypeface(regularBold);
+            				systemOptionsPaint.setAntiAlias(antialias);
+            				systemOptionsPaint.setTextSize((int) (12f * scale));
+            				systemOptionsPaint.setColor(Color.BLACK);
+            				
 							if (x48.isBitmapSkin()) {
 	            				BitmapFactory.Options opts = new BitmapFactory.Options();
 	            		        opts.inScaled = false;
@@ -488,15 +498,12 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            				
 	            				Typeface asana = Typeface.createFromAsset(x48.getAssets(), "Asana-Math.ttf");
 	            				//asana = Typeface.create(asana, Typeface.BOLD);
-	            				Typeface regularBold = Typeface.createFromAsset(x48.getAssets(), "ArchivoNarrow-Bold.ttf");
 	            				
 	            				int regularbuttonTextHeaderSizeDpi = (int) (11f * scale);
 	            				int regularbuttonTextSizeDpi = (int) (17f * scale);
 	            				
 	            				int asanabuttonTextHeaderSizeDpi = (int) (15f * scale);
 	            				int asanabuttonTextSizeDpi = (int) (21f * scale );
-	            				
-	            				boolean antialias = true;
 	            				
 	            				asanaHeadGreenPaint = new Paint();
 	            				asanaHeadGreenPaint.setTypeface(asana);
@@ -521,12 +528,6 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	            				asanaFootWhitePaint.setAntiAlias(antialias);
 	            				asanaFootWhitePaint.setTextSize(asanabuttonTextHeaderSizeDpi);
 	            				asanaFootWhitePaint.setColor(Color.WHITE);
-	            				
-	            				systemOptionsPaint = new Paint();
-	            				systemOptionsPaint.setTypeface(regularBold);
-	            				systemOptionsPaint.setAntiAlias(antialias);
-	            				systemOptionsPaint.setTextSize((int) (12f * scale));
-	            				systemOptionsPaint.setColor(Color.BLACK);
 	            				
 	            				regularHeadGreenPaint = new Paint();
 	            				regularHeadGreenPaint.setTypeface(regularBold);
@@ -918,9 +919,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 						
 						
 						if (systemOptionDisplayed) {
-							// context.getString(R.string.show_menu) returns null on certains devices
-							// probably some resources are not yet loaded at this stage? for the time being... :
-							c.drawText("Touch the screen to show system options", systemOptions_x, systemOptions_y, systemOptionsPaint);
+							c.drawText(x48.getString(R.string.show_menu), systemOptions_x, systemOptions_y, systemOptionsPaint);
 						}
 						
 					
