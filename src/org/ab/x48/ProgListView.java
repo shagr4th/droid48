@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,10 @@ public class ProgListView extends ListActivity {
 
         // go to the root directory
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        String last_dir = sp.getString("last_dir", "/sdcard");
+        String defaultPath = "/";
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
+        	defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        String last_dir = sp.getString("last_dir", defaultPath);
         showDirectory(last_dir);
     }
 

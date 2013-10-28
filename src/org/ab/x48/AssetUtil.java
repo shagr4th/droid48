@@ -13,9 +13,9 @@ import android.util.Log;
 public class AssetUtil {
 	
 	public static void copyAsset(Context context, AssetManager am, boolean force) {
-		File newDir = context.getExternalFilesDir(null);
+		File newDir = getSDDir(context);
 		File sd = Environment.getExternalStorageDirectory();
-		if (sd.exists() && sd.isDirectory() && newDir.exists() && newDir.isDirectory()) {
+		if (sd != null && sd.exists() && sd.isDirectory() && newDir.exists() && newDir.isDirectory()) {
 			File hpDir = new File(sd, ".hp48");
 			if (hpDir.exists()) {
 				File allFiles [] = hpDir.listFiles();
@@ -35,7 +35,13 @@ public class AssetUtil {
 	}
 	
 	public static File getSDDir(Context context) {
-		return context.getExternalFilesDir(null);
+		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+			// We can read and write the media
+			return context.getExternalFilesDir(null);
+		} else {
+			// Load another directory, probably local memory
+			return context.getFilesDir();
+		}
 	}
 	
 	private static void copyAsset(AssetManager am, File rep, boolean force) {
@@ -80,7 +86,7 @@ public class AssetUtil {
 	}
 	
 	public static boolean isFilesReady(Context context) {
-		File hpDir = context.getExternalFilesDir(null);
+		File hpDir = getSDDir(context);
 		if (!hpDir.exists() || !hpDir.isDirectory()) {
 			return false;
 		}
