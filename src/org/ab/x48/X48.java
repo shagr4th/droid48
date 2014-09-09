@@ -152,15 +152,13 @@ public class X48 extends Activity {
     public native void flipScreen();
     public native int loadProg(String filename);
     public native void setBlankColor(short s);
-    
+    public native void openConditionVariable();
+    public native void blockConditionVariable();
+
     public void emulatorReady() {
     	mainView.emulatorReady();
     }
-    
-    public void pauseEvent() {
-    	mainView.pauseEvent();
-    }
-    
+
     static {
         System.loadLibrary("droid48");
     }

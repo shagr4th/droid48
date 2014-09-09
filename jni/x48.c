@@ -124,7 +124,6 @@ static int      last_icon_state = -1;
 JNIEnv *android_env;
 jobject android_callback;
 jmethodID waitEvent;
-jmethodID pauseEvent;
 
 int	 dynamic_color;
 int	 direct_color;

@@ -60,6 +60,7 @@
 
 
 #include "global.h"
+#include <pthread.h>
 
 #define WHITE		0
 #define LEFT		1
@@ -149,7 +150,6 @@ extern disp_t   disp;
 extern JNIEnv *android_env;
 extern jobject android_callback;
 extern jmethodID waitEvent;
-extern jmethodID pauseEvent;
 
 extern Display *dpy;
 extern int	screen;
@@ -162,6 +162,8 @@ extern int	GetEvent	 __ProtoType__((void));
 extern void	adjust_contrast  __ProtoType__((int contrast));
 extern void	refresh_icon	 __ProtoType__((void));
 
+extern void	blockConditionVariable	 __ProtoType__((void));
+
 extern void	ShowConnections	 __ProtoType__((char *w, char *i));
 
 // extern void	exit_x48	 __ProtoType__((int tell_x11));
@@ -173,3 +175,6 @@ extern void XClearArea __ProtoType__((Display *dpy, Window win, int x, int y, in
 extern void XCopyPlane __ProtoType__((Display *dpy, Pixmap map, Window win, GC gc, int a, int b, int x, int y, int width, int height, int boo));
 
 extern void XClearWindow __ProtoType__((Display *dpy, Window win));
+
+static pthread_cond_t  uiConditionVariable  = PTHREAD_COND_INITIALIZER;
+static pthread_mutex_t uiConditionMutex     = PTHREAD_MUTEX_INITIALIZER;

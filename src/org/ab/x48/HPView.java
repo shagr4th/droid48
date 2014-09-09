@@ -1080,25 +1080,12 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 				}
 			}
 			x48.flipScreen();
-			this.notify();
+            unpauseEvent();
 		}
 	}
-	
-	
-	
-	public synchronized void pauseEvent() {
-		//Log.i("x48", "pauseEvent begin");
-		try {
-			this.wait();
-		} catch (InterruptedException e) {
-			//Log.i("x48", "pauseEvent: " + e.getMessage());
-		}
-		//Log.i("x48", "pauseEvent end");
-	}
-	
-	public synchronized void unpauseEvent() {
-		//Log.i("x48", "unpauseEvent");
-		this.notify();
+
+	public void unpauseEvent() {
+		x48.openConditionVariable();
 	}
 	
 	public synchronized int waitEvent() {

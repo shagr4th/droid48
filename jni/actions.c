@@ -672,8 +672,10 @@ LOGI("---");
 	// android_refresh_screen();
 	// usleep(50000);
 	//LOGI("enter pauseEvent");
-	 (*android_env)->CallVoidMethod(android_env, android_callback, pauseEvent);
+	 //(*android_env)->CallVoidMethod(android_env, android_callback, pauseEvent);
 	// LOGI("exit pauseEvent");
+
+	blockConditionVariable();
 
 	  if (GetEvent()) {
         if (interrupt_called)

@@ -291,7 +291,6 @@ jstring port1, jstring port2 )
 	jclass x48 = (*android_env)->GetObjectClass(env, android_callback);
 	LOGI("--x48 registered--");
 	waitEvent = (*android_env)->GetMethodID(android_env, x48, "waitEvent", "()I");
-	pauseEvent = (*android_env)->GetMethodID(android_env, x48, "pauseEvent", "()V");
 	LOGI("--methods registered--");
 }
 
@@ -423,4 +422,29 @@ Java_org_ab_x48_X48_loadProg( JNIEnv*  env,
 	int c = read_bin_file(cDesc);
 	(*env)->ReleaseStringUTFChars(env, desc, cDesc);
 	return c;
+}
+
+/**
+ * This function opens the condition variable which releases waiting threads.
+ */
+void Java_org_ab_x48_X48_openConditionVariable(JNIEnv *env,jobject o)
+{
+    pthread_mutex_lock(&uiConditionMutex);
+    pthread_cond_signal(&uiConditionVariable);
+    pthread_mutex_unlock(&uiConditionMutex);
+}
+
+/**
+ * This function blocks on the condition variable associated with the
+ */
+void Java_org_ab_x48_X48_blockConditionVariable(JNIEnv *env,jobject o)
+{
+    blockConditionVariable();
+}
+
+void blockConditionVariable()
+{
+    pthread_mutex_lock(&uiConditionMutex);
+    pthread_cond_wait(&uiConditionVariable,&uiConditionMutex);
+    pthread_mutex_unlock(&uiConditionMutex);
 }
