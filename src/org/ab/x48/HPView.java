@@ -44,6 +44,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	private SurfaceHolder mSurfaceHolder;
 	private boolean surfaceValid;
 	private Bitmap  annImages [];
+    private Bitmap  menuIcon;
 	boolean ann [];
 	int ann_pos [] = { 62, 105, 152, 197, 244, 287 };
 	private List<Integer> queuedCodes;
@@ -64,12 +65,18 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	int hidemenu_button [];
 	int buttons_coords [][] = new int [MAX_TOUCHES][4];
     int icons_coords [][] = new int [6][2];
+    int lcd_pos_x ;
+    int lcd_pos_y ;
+    int lcd_pos_x_end ;
+    int lcd_pos_y_end ;
+    int lcd_menuicon_x;
    
     Matrix keyMatrix [] = null;
-	
+
 	Matrix matrixScreen;
     Matrix matrixBack;
     Paint paint;
+    Paint topBarPaint;
     Paint screenPaint = null;
     
     Paint asanaHeadGreenPaint;
@@ -89,7 +96,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
     int systemOptions_x;
     int systemOptions_y;
     boolean systemOptionDisplayed = true;
-    
+
     Paint buttonBorderPaint = new Paint();
     
     String topLefts [] = new String [MAX_TOUCHES];
@@ -120,6 +127,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		annImages [3] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann04);
 		annImages [4] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann05);
 		annImages [5] = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ann06);
+        menuIcon = BitmapFactory.decodeResource(x48.getResources(), R.drawable.ic_action_core_overflow);
 		
 		dm = x48.getResources().getDisplayMetrics();
 		
@@ -132,7 +140,11 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		
 		paint = new Paint(); 
 		paint.setStyle(Style.FILL); 
-		paint.setARGB(128, 250, 250, 250); 
+		paint.setARGB(128, 250, 250, 250);
+
+        topBarPaint = new Paint();
+        topBarPaint.setStyle(Style.FILL);
+        topBarPaint.setARGB(128, 160, 160, 160);
 
 		screenPaint = null;
 		screenPaint = new Paint();
@@ -583,10 +595,10 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 								usable_w = ((float)w) * 5f / 9f;
 								remaning_w = w - usable_w;
 							}
-							int lcd_pos_x = land?(((int)usable_w-start_w)/2):((w - start_w)/2);
-							int lcd_pos_y = 0;
-							int lcd_pos_x_end = lcd_pos_x+start_w;
-							int lcd_pos_y_end = lcd_pos_y+start_h;
+							lcd_pos_x = land?(((int)usable_w-start_w)/2):((w - start_w)/2);
+							lcd_pos_y = 0;
+							lcd_pos_x_end = lcd_pos_x+start_w;
+							lcd_pos_y_end = lcd_pos_y+start_h;
 							float regular_key_height = usable_h / (8f + 11f/18f);
 							float regular_key_height_right = h / 7f;
 							float menu_key_height = regular_key_height*11/18;
@@ -898,7 +910,9 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 									backCanvas.drawBitmap(keys[k], keyMatrix[k], keyPaint);
 								}
 							}
-	            		}
+
+                            lcd_menuicon_x = lcd_pos_x_end - menuIcon.getWidth();
+                        }
 	            		
 	            		c.drawBitmap(backBuffer, 0, 0, null);
 	            		if (data != null)
@@ -914,12 +928,9 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 							if (ann[i])
 								c.drawBitmap(annImages[i], icons_coords[i][0], icons_coords[i][1], null);
 						}
-						
-						
-						if (systemOptionDisplayed) {
-							c.drawText(x48.getString(R.string.show_menu), systemOptions_x, systemOptions_y, systemOptionsPaint);
-						}
-						
+
+                        if (systemOptionDisplayed)
+                            c.drawBitmap(menuIcon, lcd_menuicon_x, lcd_pos_y, null);
 					
 				} else {
 					//Log.i("x48", "null canvas !");
@@ -974,7 +985,10 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
                 }
             }
             if (code == -1 && actionCode == MotionEvent.ACTION_DOWN ) {
-                x48.openOptionsMenu();
+                if (x >= lcd_menuicon_x)
+                    x48.openOptionsMenu();
+                else
+                    x48.changeKeybLite();
                 return true;
             }
 
