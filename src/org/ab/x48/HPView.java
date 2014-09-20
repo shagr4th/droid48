@@ -52,7 +52,6 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	private short buf [];
 	private short audiobuf [];
 	int currentOrientation;
-	private boolean multiTouch;
 	private AudioTrack track;
 	private TimerTask audioTask;
 	private Timer audioTimer;
@@ -103,7 +102,6 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		setFocusable(true);
 		setFocusableInTouchMode(true);
 		x48 = ((X48) context);
-		multiTouch = Wrapper.supportsMultitouch(x48);
 		mSurfaceHolder = getHolder();
 		mSurfaceHolder.addCallback(this);
 		mainScreen = Bitmap.createBitmap(262, 14+128, Bitmap.Config.RGB_565);
@@ -947,67 +945,44 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 			int code = -1;
 			int pointerID = 0;
 			systemOptionDisplayed = false;
-			if (multiTouch) {
-				if( actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_UP ||
-						actionCode == MotionEvent.ACTION_POINTER_DOWN || actionCode == MotionEvent.ACTION_POINTER_UP ) {
-					pointerID = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-					x = Wrapper.MotionEvent_getX(event, pointerID);
-					y = Wrapper.MotionEvent_getY(event, pointerID);
-					pointerID = Wrapper.MotionEvent_getPointerId(event, pointerID) + 1;
-				} else {
-					return false;
-				}
-				
-				// *_DOWN : lookup by coordinates
-				// *_UP : lookup by pointer pressed
-				if( actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_POINTER_DOWN ) {
-		            for(int i=0;i<MAX_TOUCHES;i++) {
-		                if (x >= buttons_coords[i][0] && x < buttons_coords[i][2] && y >= buttons_coords[i][1] && y < buttons_coords[i][3])
-		                {
-		                    code = i;
-		                    break;
-		                }
-		            }
-	            } else {
-	            	for(int i=0;i<MAX_TOUCHES;i++) {
-	            		if(touches[i] == pointerID)
-	            			code = i;
-	            	}
-		            }	            
-	            if (code == -1 && actionCode == MotionEvent.ACTION_DOWN ) {
-	            	x48.openOptionsMenu();
-	            	return true;
-	            }
-	       
-				if (code > -1) {
-					key(code, actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_POINTER_DOWN, pointerID);
-					return true;
-				}
-			} else {
-				// old code used before the 1.29 version: 
-				x = event.getX();
-				y = event.getY();
-				
-				if (action != MotionEvent.ACTION_DOWN && action != MotionEvent.ACTION_UP)
-					return false;
-				
-	            for(int i=0;i<MAX_TOUCHES;i++) {
-	                if (x >= buttons_coords[i][0] && x < buttons_coords[i][2] && y >= buttons_coords[i][1] && y < buttons_coords[i][3])
-	                {
-	                    code = i;
-	                    break;
-	                }
-	            }
-	            if (code == -1 && action == MotionEvent.ACTION_DOWN && currentOrientation != Configuration.ORIENTATION_LANDSCAPE ) {
-	            	x48.openOptionsMenu();
-	            	return true;
-	            }
-	       
-				if (code > -1) {
-					key(code, action == MotionEvent.ACTION_DOWN);
-					return action == MotionEvent.ACTION_DOWN;
-				}
-			}
+            if( actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_UP ||
+                    actionCode == MotionEvent.ACTION_POINTER_DOWN || actionCode == MotionEvent.ACTION_POINTER_UP ) {
+                pointerID = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                x = event.getX(pointerID);
+                y = event.getY(pointerID);
+                pointerID = event.getPointerId(pointerID) + 1;
+            } else {
+                return false;
+            }
+
+            // *_DOWN : lookup by coordinates
+            // *_UP : lookup by pointer pressed
+            if( actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_POINTER_DOWN ) {
+                for(int i=0;i<MAX_TOUCHES;i++) {
+                    if (x >= buttons_coords[i][0] && x < buttons_coords[i][2] && y >= buttons_coords[i][1] && y < buttons_coords[i][3])
+                    {
+                        code = i;
+                        break;
+                    }
+                }
+            } else {
+                for(int i=0;i<MAX_TOUCHES;i++) {
+                    if(touches[i] == pointerID) {
+                        code = i;
+                        break;
+                    }
+                }
+            }
+            if (code == -1 && actionCode == MotionEvent.ACTION_DOWN ) {
+                x48.openOptionsMenu();
+                return true;
+            }
+
+            if (code > -1) {
+                key(code, actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_POINTER_DOWN, pointerID);
+                return true;
+            }
+
 		}
 		
 		return false;
@@ -1041,16 +1016,6 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		//Log.i("x48", "code: " + code + " / " + down);
 		if (code < MAX_TOUCHES) {
 			if (down) {
-				if (!multiTouch) {
-					for(int i=0;i<MAX_TOUCHES;i++) {
-						if (touches[i] != 0) {
-							Log.i("x48", "no multitouch !, force up of " + i);
-							queuedCodes.add(i + 100);
-							touches [i] = 0;
-							break;
-						}
-					}
-				}
 				Integer cI = code+1;
 				if (!queuedCodes.contains(cI)) {
 					queuedCodes.add(cI);
@@ -1068,15 +1033,6 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 					touches [code] = 0;
 				} else {
 					Log.i("x48", "rejected up");
-					if (!multiTouch) {
-						for(int i=0;i<MAX_TOUCHES;i++) {
-							if (touches[i] != 0) {
-								Log.i("x48", "forced up of " + i);
-								queuedCodes.add(i + 100);
-								touches [i] = 0;
-							}
-						}
-					}
 				}
 			}
 			x48.flipScreen();
