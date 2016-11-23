@@ -629,7 +629,13 @@ GetEvent()
 	
 	int code = (*android_env)->CallIntMethod(android_env, android_callback, waitEvent);
 
-//LOGI("code: %d", code);
+    //LOGI("code: %d", code);
+    //FIX for Zenfone 2
+    struct timespec req, rem;
+    req.tv_sec = 0;
+    req.tv_nsec = 100L;
+    nanosleep(&req , &rem);
+
 	if (code < 0)
 	{
 		code = -code;
