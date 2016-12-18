@@ -12,7 +12,7 @@ import android.util.Log;
 
 public class AssetUtil {
 	
-	public static void copyAsset(Context context, AssetManager am, boolean force) {
+	public static boolean copyAsset(Context context, AssetManager am, boolean force) {
 		File newDir = getSDDir(context);
 		File sd = Environment.getExternalStorageDirectory();
 		if (sd != null && sd.exists() && sd.isDirectory() && newDir.exists() && newDir.isDirectory()) {
@@ -31,7 +31,7 @@ public class AssetUtil {
 				hpDir.delete();
 			}
 		}
-		copyAsset(am, newDir, force);
+		return copyAsset(am, newDir, force);
 	}
 	
 	public static File getSDDir(Context context) {
@@ -44,7 +44,8 @@ public class AssetUtil {
 		}
 	}
 	
-	private static void copyAsset(AssetManager am, File rep, boolean force) {
+	private static boolean copyAsset(AssetManager am, File rep, boolean force) {
+		boolean existingInstall = false;
 		try {
 			String assets[] = am.list( "" );
 			for( int i = 0 ; i < assets.length ; i++ ) {
@@ -66,6 +67,7 @@ public class AssetUtil {
 				//boolean SKUNK = assets[i].equals("SKUNK");
 				if (hp48 || rom || ram || hp48s || roms || rams) {
 					File fout = new File(rep, assets[i]);
+					existingInstall |= fout.exists();
 					if (!fout.exists() || fout.length() == 0 || (required > 0 && fout.length() != required) || force) {
 						Log.i("x48", "Overwriting " + assets[i]);
 						FileOutputStream out = new FileOutputStream(fout);
@@ -83,6 +85,7 @@ public class AssetUtil {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return existingInstall;
 	}
 	
 	public static boolean isFilesReady(Context context) {

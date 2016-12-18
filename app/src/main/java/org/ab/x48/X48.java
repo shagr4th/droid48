@@ -35,18 +35,25 @@ public class X48 extends Activity {
 	static final private int ROM_ID = 123;
 	
 	private static EmulatorThread thread;
-	
+
+	private static boolean errorLib;
 	
     // http://www.hpcalc.org/hp48/pc/emulators/gxrom-r.zip
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("x48", "starting activity");
-        AssetUtil.copyAsset(this, getResources().getAssets(), false);
-        readyToGo() ;
+		if (errorLib) {
+			showDialog(DIALOG_LIB_KO);
+			return;
+		}
+		//Log.i("x48", "starting activity");
+		boolean firstLaunch = !AssetUtil.copyAsset(this, getResources().getAssets(), false);
+
+		readyToGo() ;
         if (!AssetUtil.isFilesReady(this)) {
         	showDialog(DIALOG_ROM_KO);
+			return;
         }
     }
     
@@ -89,6 +96,10 @@ public class X48 extends Activity {
     
     public void checkPrefs() {
     	SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		/*if (mPrefs.getBoolean("blockOrientation", false))
+    		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+    	else
+    		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);*/
     	bitmapSkin = mPrefs.getBoolean("bitmapskin", false);
     	mainView.backBuffer = null;
     	mainView.needFlip = true;
@@ -160,7 +171,11 @@ public class X48 extends Activity {
     }
 
     static {
-        System.loadLibrary("droid48");
+		try {
+			System.loadLibrary("droid48");
+		} catch (java.lang.UnsatisfiedLinkError e) {
+			errorLib = true;
+		}
     }
 	@Override
 	protected void onResume() {
@@ -177,6 +192,9 @@ public class X48 extends Activity {
    @Override
    public boolean onCreateOptionsMenu(Menu menu) {
        super.onCreateOptionsMenu(menu);
+
+	   if (mainView == null)
+		   return true;
 
        // We are going to create two menus. Note that we assign them
        // unique integer IDs, labels from our string resources, and
@@ -243,6 +261,7 @@ public class X48 extends Activity {
    private static final int DIALOG_ROM_KO = 3;
    private static final int DIALOG_RAM_KO = 4;
    private static final int DIALOG_RAM_OK = 5;
+	private static final int DIALOG_LIB_KO = 6;
    
    @Override
    protected Dialog onCreateDialog(int id) {
@@ -301,6 +320,17 @@ public class X48 extends Activity {
 	       }
 	   })
 	   .create();
+	   case DIALOG_LIB_KO: return new AlertDialog.Builder(X48.this)
+			   .setIcon(R.drawable.alert_dialog_icon)
+			   .setTitle(R.string.help)
+			   .setMessage(R.string.lib_ko)
+			   .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+				   public void onClick(DialogInterface dialog, int whichButton) {
+
+					   onDestroy();
+				   }
+			   })
+			   .create();
 	   }
 	   return null;
    }

@@ -52,6 +52,12 @@ public class Settings extends PreferenceActivity {
 	        savePref.setTitle(R.string.saveonexit_msgbox);
 	        savePref.setSummary(R.string.saveonexit_msgbox_value);
 	        inlinePrefCat.addPreference(savePref);
+
+		 	/*CheckBoxPreference blockOrientation = new CheckBoxPreference(this);
+	        blockOrientation.setKey("blockOrientation");
+	        blockOrientation.setTitle(R.string.blockorientation_msgbox);
+	        blockOrientation.setSummary(R.string.blockorientation_msgboxvalue);
+	        inlinePrefCat.addPreference(blockOrientation);*/
 	        
 	        CheckBoxPreference keybLitePref = new CheckBoxPreference(this);
 	        keybLitePref.setKey("keybLite");

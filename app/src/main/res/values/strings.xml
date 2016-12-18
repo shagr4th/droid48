@@ -8,14 +8,14 @@
 <string name="button_quit">Quit</string>
 <string name="reset_memory">Reset memory and quit</string>
 <string name="help">Help</string>
-<string name="ok">Ok</string>
+<string name="ok">OK</string>
 <string name="prog_ok">The program/object has been put on the stack.\nNow, some HP knowledge is necessary:\n\n- if this is a library, push 0, then STO and shut down (right shift + on) / restart (on) the calculator: the program will be available in the Library (shift right + 2) menu.\n\n- If this is a regular object (dir, external, etc.), push a name between quotes on the stack (for example, \'prog\'), then push STO: the prog will be available in the VAR menu</string>
 <string name="prog_ko">This program cannot be loaded.\nMake sure it\'s a valid one and you have enough memory to load it</string>
-<string name="rom_ko">Rom files not found! This shouldn\'t happen :\\. Quitting now...</string>
+<string name="rom_ko">Rom files not found! This shouldn\'t happen :\\. Quitting now&#8230;</string>
 <string name="general_preferences">General settings</string>
 <string name="display_preferences">Display settings</string>
 <string name="misc_preferences">Misc settings</string>
-
+<string name="lib_ko">Application cannot be started due to a native library error. Please try to redownload and reinstall the app</string>
 <string name="choose_contrast">Contrast</string>
 <string name="choose_contrast_value">Select the contrast</string>
 <string name="choose_backkey">Back key behavior</string>
@@ -54,10 +54,20 @@
 <string name="disableLite">Disable minimal controls</string>
 <string name="disableLite_summary">Prevents lite controls to show up when touching LCD</string>
 <string name="sound">Enable sound</string>
-<string name="sound_summary">EXPERIMENTAL: system beeps ok, so far</string>
+<string name="sound_summary">EXPERIMENTAL: System beeps OK, so far</string>
 <string name="hp48s">HP48 S</string>
 <string name="hp48s_summary">Emulate an HP48S (Need App Restart !)</string>
 <string name="bitmapSkin">HP48 Bitmap Skin</string>
 <string name="bitmapSkin_summary">Restore the previous bitmap skin (48G mode only !)</string>
 <string name="show_menu">Touch the screen to show system options</string>
+<string name="information">Information</string>
+<string name="appreciation">Now you can show your appreciation for Droid48\nThank you !</string>
+<string name="dismissforever">Dismiss forever</string>
+<string name="donate">Donate</string>
+<string name="donate_explain">If you like Droid48, you can show your appreciation here with a donation ! Thank you very much !</string>
+<string name="thanks">Thanks for the donation !</string>
+<string name="pleasewait">Connecting to billing system, please wait&#8230;</string>
+<string name="blockorientation_msgbox">Lock portrait mode</string>
+<string name="blockorientation_msgboxvalue">Prevent Droid48 to switch in landscape mode</string>
+
 </resources>
