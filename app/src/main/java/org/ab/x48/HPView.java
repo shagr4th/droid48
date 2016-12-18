@@ -112,7 +112,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		mSurfaceHolder = getHolder();
 		mSurfaceHolder.addCallback(this);
 		mainScreen = Bitmap.createBitmap(262, 14+128, Bitmap.Config.RGB_565);
-		queuedCodes = new Vector<Integer>();
+		queuedCodes = new ArrayList<Integer>();
 		ann = new boolean [6];
 		buf = new short [(14+128)*262];
 		audiobuf = new short [44100]; // 1s worth
@@ -993,6 +993,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
             }
 
             if (code > -1) {
+				systemOptionDisplayed = false;
                 key(code, actionCode == MotionEvent.ACTION_DOWN || actionCode == MotionEvent.ACTION_POINTER_DOWN, pointerID);
                 return true;
             }
@@ -1026,31 +1027,23 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		key(code, down, 255); // Use pointerID 255 for keyboard
 	}
 	
-	public synchronized void key(int code, boolean down, int pointerID) {
-		//Log.i("x48", "code: " + code + " / " + down);
-		if (code < MAX_TOUCHES) {
-			if (down) {
-				Integer cI = code+1;
-				if (!queuedCodes.contains(cI)) {
+	public void key(int code, boolean down, int pointerID) {
+		synchronized(this) {
+			if (code < MAX_TOUCHES) {
+				if (down) {
+					Integer cI = code + 1;
 					queuedCodes.add(cI);
-					touches [code] = pointerID;
+					touches[code] = pointerID;
 					performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
-							HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING );
+							HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
 				} else {
-					Log.i("x48", "rejected down");
-				}
-			}
-			else {
-				Integer cI = code+100;
-				if (!queuedCodes.contains(cI) && touches [code] != 0) {
+					Integer cI = code + 100;
 					queuedCodes.add(cI);
-					touches [code] = 0;
-				} else {
-					Log.i("x48", "rejected up");
+					touches[code] = 0;
 				}
+				x48.flipScreen();
+				unpauseEvent();
 			}
-			x48.flipScreen();
-            unpauseEvent();
 		}
 	}
 
@@ -1058,13 +1051,14 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		x48.openConditionVariable();
 	}
 	
-	public synchronized int waitEvent() {
-		if (queuedCodes.size() == 0) {
-			return 0;
-		}
-		else {
-			int c = queuedCodes.remove(0);
-			return c;
+	public int waitEvent() {
+		synchronized(this) {
+			if (queuedCodes.size() == 0) {
+				return 0;
+			} else {
+				int c = queuedCodes.remove(0);
+				return c;
+			}
 		}
     }
 	
