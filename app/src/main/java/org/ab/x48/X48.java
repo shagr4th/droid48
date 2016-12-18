@@ -16,12 +16,17 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
+
+import com.getkeepsafe.relinker.ReLinker;
 
 public class X48 extends Activity {
     
@@ -38,26 +43,57 @@ public class X48 extends Activity {
 	
 	private static EmulatorThread thread;
 	private static Timer SIGALRM;
+	private Handler mHandler;
 
-	private static boolean errorLib;
-	
     // http://www.hpcalc.org/hp48/pc/emulators/gxrom-r.zip
+
+	private ReLinker.Logger logcatLogger = new ReLinker.Logger() {
+		@Override
+		public void log(String message) {
+			Log.d("ReLinker", message);
+		}
+	};
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-		if (errorLib) {
-			showDialog(DIALOG_LIB_KO);
-			return;
-		}
+
 		//Log.i("x48", "starting activity");
 		boolean firstLaunch = !AssetUtil.copyAsset(this, getResources().getAssets(), false);
 
-		readyToGo() ;
-        if (!AssetUtil.isFilesReady(this)) {
-        	showDialog(DIALOG_ROM_KO);
-			return;
-        }
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		requestWindowFeature(Window.FEATURE_PROGRESS);
+		setContentView(R.layout.main);
+		mainView = (HPView) findViewById(R.id.hpview);
+
+		mHandler = new Handler(Looper.getMainLooper()) {
+			@Override
+			public void handleMessage(Message inputMessage) {
+				if (inputMessage.what == 1) {
+					readyToGo();
+					if (!AssetUtil.isFilesReady(X48.this)) {
+						showDialog(DIALOG_ROM_KO);
+						return;
+					}
+				} else {
+					showDialog(DIALOG_LIB_KO);
+				}
+			}
+		};
+
+		ReLinker.recursively().log(logcatLogger).loadLibrary(X48.this, "droid48", new ReLinker.LoadListener() {
+
+			@Override
+			public void success() {
+				mHandler.obtainMessage(1).sendToTarget();
+			}
+
+			@Override
+			public void failure(Throwable t) {
+				mHandler.obtainMessage(0).sendToTarget();
+			}
+		});
+
     }
     
     // http://stackoverflow.com/questions/9996333/openoptionsmenu-function-not-working-in-ics
@@ -81,19 +117,16 @@ public class X48 extends Activity {
     }
  
     public void readyToGo() {
-    	hp48s = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("hp48s", false);
-    	
-    	requestWindowFeature(Window.FEATURE_NO_TITLE);
-        requestWindowFeature(Window.FEATURE_PROGRESS);
-        setContentView(R.layout.main);
-        mainView = (HPView) findViewById(R.id.hpview);
-        
-        checkPrefs();
+		hp48s = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("hp48s", false);
+
+    	checkPrefs();
 
 		thread = new EmulatorThread(this);
     	thread.start();
     	mainView.resume();
-    }
+		mainView.updateContrast();
+
+	}
     
 
     
@@ -172,13 +205,6 @@ public class X48 extends Activity {
     	mainView.emulatorReady();
     }
 
-    static {
-		try {
-			System.loadLibrary("droid48");
-		} catch (java.lang.UnsatisfiedLinkError e) {
-			errorLib = true;
-		}
-    }
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -191,7 +217,8 @@ public class X48 extends Activity {
 		SIGALRM.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				SIGALRM();
+				if (thread != null)
+					SIGALRM();
 			}
 		}, 0, 20);
 		if (mainView  != null)

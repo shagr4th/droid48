@@ -6,7 +6,7 @@ model {
 
         defaultConfig {
             applicationId "org.ab.x48"
-            minSdkVersion.apiLevel 8
+            minSdkVersion.apiLevel 9
             targetSdkVersion.apiLevel 24
         }
 
@@ -22,4 +22,7 @@ model {
             }
         }
     }
+}
+dependencies {
+    compile 'com.getkeepsafe.relinker:relinker:1.2.2'
 }
