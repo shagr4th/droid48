@@ -90,9 +90,7 @@ public class X48 extends Activity {
         
         checkPrefs();
 
-		SIGALRM = new Timer();
-
-        thread = new EmulatorThread(this);
+		thread = new EmulatorThread(this);
     	thread.start();
     	mainView.resume();
     }
@@ -185,6 +183,11 @@ public class X48 extends Activity {
 	protected void onResume() {
 		super.onResume();
 		Log.i("x48", "resume");
+		if (SIGALRM != null) {
+			SIGALRM.cancel();
+			SIGALRM = null;
+		}
+		SIGALRM = new Timer();
 		SIGALRM.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -458,7 +461,10 @@ private void managePort(int number, String value) {
 	protected void onPause() {
 		super.onPause();
 		Log.i("x48", "pause");
-		SIGALRM.cancel();
+		if (SIGALRM != null) {
+			SIGALRM.cancel();
+			SIGALRM = null;
+		}
 		if (mainView  != null)
 			mainView.pause();
 		Log.i("x48", "paused");

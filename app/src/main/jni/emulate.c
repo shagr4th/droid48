@@ -2234,7 +2234,7 @@ schedule()
   old_sched_instr = instructions;
 
 #ifdef DEBUG_SCHED
-  fprintf(stderr, "schedule called after %ld instructions\n", steps);
+    LOGE("schedule called after %ld instructions\n", steps);
 #endif
 
   if ((sched_timer2 -= steps) <= 0) {
@@ -2255,7 +2255,7 @@ schedule()
   schedule_event = sched_timer2;
 
 #ifdef DEBUG_SCHED
-  fprintf(stderr, "next timer 2 step: %ld, event: %ld\n",
+    LOGE("next timer 2 step: %ld, event: %ld\n",
           sched_timer2, schedule_event);
 #endif
 
@@ -2265,7 +2265,7 @@ schedule()
       if (device.display_touched) device.display_touched -= steps;
       if (device.display_touched < 0) device.display_touched = 1;
 #ifdef DEBUG_DISP_SCHED
-      fprintf(stderr, "check_device: disp_when %d, disp_touched %d\n",
+        LOGE("check_device: disp_when %d, disp_touched %d\n",
               sched_display, device.display_touched);
 #endif
     }
@@ -2287,7 +2287,7 @@ schedule()
   if (sched_receive < schedule_event) schedule_event = sched_receive;
 
 #ifdef DEBUG_SCHED
-  fprintf(stderr, "next receive: %ld, event: %ld\n",
+    LOGE("next receive: %ld, event: %ld\n",
           sched_receive, schedule_event);
 #endif
 
@@ -2329,7 +2329,7 @@ schedule()
   if (sched_adjtime < schedule_event) schedule_event = sched_adjtime;
 
 #ifdef DEBUG_SCHED
-  fprintf(stderr, "next adjtime: %ld, event: %ld\n",
+    LOGE( "next adjtime: %ld, event: %ld\n",
           sched_adjtime, schedule_event);
 #endif
 
@@ -2349,7 +2349,7 @@ schedule()
   if (sched_timer1 < schedule_event) schedule_event = sched_timer1;
 
 #ifdef DEBUG_SCHED
-  fprintf(stderr, "next timer 1 step: %ld, event: %ld\n",
+    LOGE( "next timer 1 step: %ld, event: %ld\n",
           sched_timer1, schedule_event);
 #endif
 
@@ -2380,11 +2380,11 @@ schedule()
 #ifdef DEBUG_TIMER
     if (delta_t_1 > 0) {
 #if 0
-      fprintf(stderr, "I/s = %ld, T1 I/TICK = %d (%ld), T2 I/TICK = %d (%ld)\n",
+      LOGE("I/s = %ld, T1 I/TICK = %d (%ld), T2 I/TICK = %d (%ld)\n",
               saturn.i_per_s, saturn.t1_tick, t1_i_per_tick,
               saturn.t2_tick, t2_i_per_tick);
 #else
-      fprintf(stderr, "I/s = %ld, T1 I/TICK = %d, T2 I/TICK = %d (%ld)\n",
+      LOGE( "I/s = %ld, T1 I/TICK = %d, T2 I/TICK = %d (%ld)\n",
               saturn.i_per_s, saturn.t1_tick, saturn.t2_tick, t2_i_per_tick);
 #endif
     }
@@ -2394,7 +2394,7 @@ schedule()
     schedule_event = sched_statistics;
 
 #ifdef DEBUG_SCHED
-  fprintf(stderr, "next statistics: %ld, event: %ld\n",
+    LOGE( "next statistics: %ld, event: %ld\n",
           sched_statistics, schedule_event);
 #endif
 
@@ -2410,7 +2410,7 @@ schedule()
     schedule_event = sched_instr_rollover;
 
 #ifdef DEBUG_SCHED
-  fprintf(stderr, "next instruction rollover: %ld, event: %ld\n",
+    LOGE("next instruction rollover: %ld, event: %ld\n",
           sched_instr_rollover, schedule_event);
 #endif
 
