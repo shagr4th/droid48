@@ -2415,18 +2415,15 @@ schedule()
 #endif
 
   schedule_event--;
-/*
+
   if (got_alarm) {
     got_alarm = 0;
 #ifdef HAVE_XSHM
     if (disp.display_update) refresh_display();
 #endif
     GetEvent();
-    //usleep(500);
   }
-*/
 
-  GetEvent();
 }
 
 int

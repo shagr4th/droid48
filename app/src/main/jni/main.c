@@ -427,19 +427,12 @@ Java_org_ab_x48_X48_loadProg( JNIEnv*  env,
 /**
  * This function opens the condition variable which releases waiting threads.
  */
-void Java_org_ab_x48_X48_openConditionVariable(JNIEnv *env,jobject o)
+void Java_org_ab_x48_X48_SIGALRM(JNIEnv *env,jobject o)
 {
+    got_alarm = 1;
     pthread_mutex_lock(&uiConditionMutex);
     pthread_cond_signal(&uiConditionVariable);
     pthread_mutex_unlock(&uiConditionMutex);
-}
-
-/**
- * This function blocks on the condition variable associated with the
- */
-void Java_org_ab_x48_X48_blockConditionVariable(JNIEnv *env,jobject o)
-{
-    blockConditionVariable();
 }
 
 void blockConditionVariable()

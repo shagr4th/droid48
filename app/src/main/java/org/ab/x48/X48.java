@@ -3,6 +3,8 @@ package org.ab.x48;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 import android.app.Activity;
@@ -35,6 +37,7 @@ public class X48 extends Activity {
 	static final private int ROM_ID = 123;
 	
 	private static EmulatorThread thread;
+	private static Timer SIGALRM;
 
 	private static boolean errorLib;
 	
@@ -86,7 +89,9 @@ public class X48 extends Activity {
         mainView = (HPView) findViewById(R.id.hpview);
         
         checkPrefs();
-        
+
+		SIGALRM = new Timer();
+
         thread = new EmulatorThread(this);
     	thread.start();
     	mainView.resume();
@@ -163,8 +168,7 @@ public class X48 extends Activity {
     public native void flipScreen();
     public native int loadProg(String filename);
     public native void setBlankColor(short s);
-    public native void openConditionVariable();
-    public native void blockConditionVariable();
+	public native void SIGALRM();
 
     public void emulatorReady() {
     	mainView.emulatorReady();
@@ -181,6 +185,12 @@ public class X48 extends Activity {
 	protected void onResume() {
 		super.onResume();
 		Log.i("x48", "resume");
+		SIGALRM.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				SIGALRM();
+			}
+		}, 0, 20);
 		if (mainView  != null)
 			mainView.resume();
 		Log.i("x48", "resumed");
@@ -448,6 +458,7 @@ private void managePort(int number, String value) {
 	protected void onPause() {
 		super.onPause();
 		Log.i("x48", "pause");
+		SIGALRM.cancel();
 		if (mainView  != null)
 			mainView.pause();
 		Log.i("x48", "paused");
@@ -460,8 +471,6 @@ private void managePort(int number, String value) {
 		if (saveonExit)
 			saveState();
 		stopHPEmulator();
-		if (mainView  != null)
-			mainView.unpauseEvent();
 		if (need_to_quit)
 			System.exit(0);
 	}

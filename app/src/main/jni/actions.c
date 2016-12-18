@@ -626,38 +626,20 @@ do_shutdown()
           saturn.PC, saturn.t2_ctrl, saturn.timer2);
 #endif
 
- /* if (in_debugger)
+  if (in_debugger)
     wake = 1;
-  else*/
+  else
     wake = 0;
 
   alarms = 0;
-  
- // android_refresh_screen();
-
- /* do {
-LOGI("---");
-    pause();
-LOGI("---");
-    if (got_alarm) {
-      got_alarm = 0;
-
-#ifdef HAVE_XSHM
-      if (disp.display_update) refresh_display();
-#endif*/
-
-//android_refresh_screen();
-//	usleep(50000);
 
       do {
 
-		/*  do {
-
-    (*android_env)->CallVoidMethod(android_env, android_callback, pauseEvent);
+        blockConditionVariable();
 
     if (got_alarm) {
 
-      got_alarm = 0;*/
+      got_alarm = 0;
 
       ticks = get_t1_t2();
       if (saturn.t2_ctrl & 0x01) {
@@ -667,16 +649,6 @@ LOGI("---");
       set_t1 = ticks.t1_ticks;
 
       interrupt_called = 0;
-
-
-	// android_refresh_screen();
-	// usleep(50000);
-	//LOGI("enter pauseEvent");
-	 //(*android_env)->CallVoidMethod(android_env, android_callback, pauseEvent);
-	// LOGI("exit pauseEvent");
-
-	blockConditionVariable();
-
 	  if (GetEvent()) {
         if (interrupt_called)
           wake = 1;
@@ -720,7 +692,12 @@ LOGI("---");
 
       alarms++;
 
-	//}
+	}
+
+        if (enter_debugger)
+        {
+          wake = 1;
+        }
 
   } while (wake == 0 && exit_state);
 
