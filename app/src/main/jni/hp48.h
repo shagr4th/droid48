@@ -248,6 +248,7 @@ extern char    ram_filename  [256];
 extern char    conf_filename  [256];
 extern char    port1_filename [256];
 extern char    port2_filename [256];
+extern int  throttle;
 
 extern int		got_alarm;
 

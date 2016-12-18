@@ -55,6 +55,7 @@
 
 #include "debugger.h"
 
+
 #if 0
 #define DEBUG_TIMER
 #define DEBUG_SCHED
@@ -66,6 +67,7 @@ static long	jumpaddr;
 unsigned long	instructions = 0;
 unsigned long	old_instr = 0;
 
+int throttle;
 int		rece_instr = 0;
 int		device_check = 0;
 
@@ -2453,35 +2455,25 @@ emulate()
 
   set_t1 = saturn.timer1;
 
-/*
-
-   do {
-    step_instruction();
-	
-    if (--schedule_event <= 0) {
-      schedule();
-    }
-  } while (exit_state);
-*/
-
   do {
 	  
     step_instruction();
 
-
-    /* gettimeofday(&tv, &tz);
-    while ((tv.tv_sec == tv2.tv_sec) && ((tv.tv_usec - tv2.tv_usec) < 2)) {
-	gettimeofday(&tv, &tz);
-    }
-    tv2.tv_usec = tv.tv_usec;
-    tv2.tv_sec = tv.tv_sec;
-
-    usleep(3);
-*/
-    if (schedule_event-- == 0)
       {
-        schedule();
+          int i;
+          for (i=0; i < sizeof(saturn.keybuf.rows)/sizeof(saturn.keybuf.rows[0]); i++) {
+              if (saturn.keybuf.rows[i] || throttle) {
+                  gettimeofday(&tv, &tz);
+                  while ((tv.tv_sec == tv2.tv_sec) && ((tv.tv_usec - tv2.tv_usec) < 2)) gettimeofday(&tv, &tz);
+                  tv2.tv_usec = tv.tv_usec; tv2.tv_sec = tv.tv_sec;
+                  break;
+              }
+          }
       }
+
+      if (schedule_event < 0) { /* puts("bug"); schedule_event = 0; */ }
+      if (schedule_event-- <= 0) { schedule(); }
+
   } while (!enter_debugger && exit_state); // exit_state
 
   return 0;
