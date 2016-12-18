@@ -112,6 +112,8 @@ static word_20 jumpmasks[] = {
   0xffff0000, 0xfff00000, 0xff000000, 0xf0000000
 };
 
+int check_out_register();
+
 int
 #ifdef __FunctionProto__
 decode_group_80(void)
@@ -694,7 +696,7 @@ decode_group_1()
   }
 }
 
-inline int
+int
 #ifdef __FunctionProto__
 decode_8_thru_f(int op1)
 #else
