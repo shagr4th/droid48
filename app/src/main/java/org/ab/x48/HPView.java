@@ -173,7 +173,6 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		if (c > 2)
 			c = 2;
 		setContrast(0.5 * c);
-		//x48.flipScreen();
 	}
 	
 	private void setContrast(double contrast_factor) {
@@ -912,24 +911,25 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 
                             lcd_menuicon_x = lcd_pos_x_end - menuIcon.getWidth();
                         }
-	            		
-	            		c.drawBitmap(backBuffer, 0, 0, null);
-	            		if (data != null)
-	            			mainScreen.copyPixelsFromBuffer(ShortBuffer.wrap(data));
-						c.drawBitmap(mainScreen, matrixScreen, screenPaint);
-						for(int i=0;i<MAX_TOUCHES;i++) {
-							if (touches[i] != 0) {
-								c.drawRoundRect(new RectF(new Rect(buttons_coords[i][0], buttons_coords[i][1], buttons_coords[i][2], buttons_coords[i][3])), 12f, 12f, paint);
-							}
-						}
-						
-						for(int i=0;i<6;i++) {
-							if (ann[i])
-								c.drawBitmap(annImages[i], icons_coords[i][0], icons_coords[i][1], null);
-						}
 
-                        if (systemOptionDisplayed)
-                            c.drawBitmap(menuIcon, lcd_menuicon_x, lcd_pos_y, null);
+					if (backBuffer != null)
+	            		c.drawBitmap(backBuffer, 0, 0, null);
+					if (data != null)
+						mainScreen.copyPixelsFromBuffer(ShortBuffer.wrap(data));
+					c.drawBitmap(mainScreen, matrixScreen, screenPaint);
+					for(int i=0;i<MAX_TOUCHES;i++) {
+						if (touches[i] != 0) {
+							c.drawRoundRect(new RectF(new Rect(buttons_coords[i][0], buttons_coords[i][1], buttons_coords[i][2], buttons_coords[i][3])), 12f, 12f, paint);
+						}
+					}
+
+					for(int i=0;i<6;i++) {
+						if (ann[i])
+							c.drawBitmap(annImages[i], icons_coords[i][0], icons_coords[i][1], null);
+					}
+
+					if (systemOptionDisplayed)
+						c.drawBitmap(menuIcon, lcd_menuicon_x, lcd_pos_y, null);
 					
 				} else {
 					//Log.i("x48", "null canvas !");

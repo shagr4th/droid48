@@ -63,13 +63,13 @@ public class X48 extends Activity {
 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		requestWindowFeature(Window.FEATURE_PROGRESS);
-		setContentView(R.layout.main);
-		mainView = (HPView) findViewById(R.id.hpview);
-
 		mHandler = new Handler(Looper.getMainLooper()) {
 			@Override
 			public void handleMessage(Message inputMessage) {
 				if (inputMessage.what == 1) {
+					setContentView(R.layout.main);
+					mainView = (HPView) findViewById(R.id.hpview);
+
 					readyToGo();
 					if (!AssetUtil.isFilesReady(X48.this)) {
 						showDialog(DIALOG_ROM_KO);
