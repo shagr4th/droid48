@@ -210,9 +210,7 @@ set_accesstime()
   (void)time(&gmt);
   ltm = localtime(&gmt);
 #ifdef SYSV_TIME
-  // shagrath: the timezone field is not available on 2.1 devices :\ so it's crashing
-  // revert the timezone fix for the time being
-  //systime_offset = timezone;
+  systime_offset = timezone;
   if( ltm->tm_isdst )
     systime_offset -= 3600;
 #else
