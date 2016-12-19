@@ -1028,27 +1028,31 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	
 	public void key(int code, boolean down, int pointerID) {
 		if (code < MAX_TOUCHES) {
-			if (down) {
-				Integer cI = code + 1;
-				queuedCodes.add(cI);
-				touches[code] = pointerID;
-				performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
-						HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
-			} else {
-				Integer cI = code + 100;
-				queuedCodes.add(cI);
-				touches[code] = 0;
+			synchronized(queuedCodes) {
+				if (down) {
+					Integer cI = code + 1;
+					queuedCodes.add(cI);
+					touches[code] = pointerID;
+					performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
+							HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+				} else {
+					Integer cI = code + 100;
+					queuedCodes.add(cI);
+					touches[code] = 0;
+				}
 			}
 			x48.flipScreen();
 		}
 	}
 
 	public int waitEvent() {
-		if (queuedCodes.size() == 0) {
-			return 0;
-		} else {
-			int c = queuedCodes.remove(0);
-			return c;
+		synchronized(queuedCodes) {
+			if (queuedCodes.size() == 0) {
+				return 0;
+			} else {
+				int c = queuedCodes.remove(0);
+				return c;
+			}
 		}
     }
 	
