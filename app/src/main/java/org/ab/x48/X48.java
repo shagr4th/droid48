@@ -50,7 +50,7 @@ public class X48 extends Activity {
 	private ReLinker.Logger logcatLogger = new ReLinker.Logger() {
 		@Override
 		public void log(String message) {
-			Log.d("ReLinker", message);
+			Log.d("x48", message);
 		}
 	};
 	
@@ -90,6 +90,7 @@ public class X48 extends Activity {
 
 			@Override
 			public void failure(Throwable t) {
+				t.printStackTrace();
 				mHandler.obtainMessage(0).sendToTarget();
 			}
 		});

@@ -1050,8 +1050,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 			if (queuedCodes.size() == 0) {
 				return 0;
 			} else {
-				int c = queuedCodes.remove(0);
-				return c;
+				return queuedCodes.remove(0);
 			}
 		}
     }

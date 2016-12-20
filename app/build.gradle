@@ -13,6 +13,7 @@ model {
         ndk {
             moduleName "droid48"
             ldLibs.addAll(["android", "log"])
+            platformVersion = "9"
         }
 
         productFlavors {
