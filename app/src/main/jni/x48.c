@@ -622,12 +622,38 @@ GetEvent()
 #endif
 {
 
-	int         wake = 0;
+    static int release_pending = 0;
+    static int release_pending_code = 0;
+	int         wake = 1;
 	/*wake = (*android_env)->CallIntMethod(android_env, android_callback, waitEvent);
 	return wake;
 	*/
 
-	int code = (*android_env)->CallIntMethod(android_env, android_callback, waitEvent);
+    if (release_pending)
+    {
+        key_event(release_pending_code, 0);
+        wake = 1;
+        release_pending = 0;
+        return wake;
+    }
+
+    unsigned int code = 0;
+    while ((code=(*android_env)->CallIntMethod(android_env, android_callback, waitEvent)) > 0) {
+        //LOGI("code %u", code);
+        if (code < 100)
+        {
+            key_event(code - 1, 1);
+            wake = 1;
+            break;
+        } else {
+            //key_event(code - 100, 0);
+            release_pending = 1;
+            release_pending_code = code - 100;
+            break;
+        }
+    }
+
+    return wake;
 
     //LOGI("code: %d", code);
     //FIX for Zenfone 2
@@ -636,7 +662,7 @@ GetEvent()
     req.tv_nsec = 100L;
     nanosleep(&req , &rem);*/
 
-	if (code < 0)
+	/*if (code < 0)
 	{
 		code = -code;
 		wake = 0;
@@ -655,7 +681,7 @@ GetEvent()
 
 //	LOGI("wake: %d", wake);
 
-	return wake;
+	return wake;*/
 }
 
 int

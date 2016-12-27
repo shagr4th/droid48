@@ -35,10 +35,9 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
+public class HPView extends SurfaceView implements SurfaceHolder.Callback {
 
 	private static final int MAX_TOUCHES = 49;
-	private Thread drawThread;
 	private X48 x48;
 	private Bitmap mainScreen;
 	private SurfaceHolder mSurfaceHolder;
@@ -1028,19 +1027,23 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 	
 	public void key(int code, boolean down, int pointerID) {
 		if (code < MAX_TOUCHES) {
-			synchronized(queuedCodes) {
 				if (down) {
 					Integer cI = code + 1;
-					queuedCodes.add(cI);
+					synchronized(queuedCodes) {
+						queuedCodes.add(cI);
+					}
 					touches[code] = pointerID;
 					performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
 							HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
 				} else {
 					Integer cI = code + 100;
-					queuedCodes.add(cI);
+					synchronized(queuedCodes) {
+						queuedCodes.add(cI);
+					}
 					touches[code] = 0;
 				}
-			}
+
+			//x48.SIGALRM();
 			x48.flipScreen();
 		}
 	}
@@ -1082,8 +1085,6 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		Log.i("x48", "Surface created");
 		
 		surfaceValid = true;
-		drawThread = new Thread(this);
-		drawThread.start();
 		
 	}
 
@@ -1114,24 +1115,13 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback, Runna
 		pause = false;
 	}
 
-	@Override
-	public void run() {
-		Log.i("x48", "drawing thread started");
-		x48.flipScreen();
-		while (surfaceValid) {
+	public void refresh() {
+		if (surfaceValid) {
 			if (needFlip || x48.fillScreenData(buf, ann) == 1) {
 				needFlip = false;
 				refreshMainScreen(buf);
 			}
-			do {
-				try {
-					Thread.sleep(40);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			} while (pause && surfaceValid);
 		}
-		//Log.i("x48", "drawing thread stopped");
 	}
 
 	@Override

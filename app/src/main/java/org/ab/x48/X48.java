@@ -215,11 +215,14 @@ public class X48 extends Activity {
 			SIGALRM = null;
 		}
 		SIGALRM = new Timer();
-		SIGALRM.schedule(new TimerTask() {
+		SIGALRM.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
-				if (thread != null)
+				if (thread != null) {
 					SIGALRM();
+					if (mainView != null)
+						mainView.refresh();
+				}
 			}
 		}, 0, 20);
 		if (mainView  != null)
