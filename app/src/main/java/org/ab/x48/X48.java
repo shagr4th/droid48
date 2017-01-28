@@ -138,20 +138,11 @@ public class X48 extends Activity {
     	else
     		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);*/
     	bitmapSkin = mPrefs.getBoolean("bitmapskin", false);
-    	mainView.backBuffer = null;
-    	mainView.needFlip = true;
-		String port1 = mPrefs.getString("port1", "0");
+    	String port1 = mPrefs.getString("port1", "0");
 		managePort(1, port1);
 		String port2 = mPrefs.getString("port2", "0");
 		managePort(2, port2);
 		saveonExit = mPrefs.getBoolean("saveOnExit", false);
-		if (mainView != null) {
-			mainView.setHapticFeedbackEnabled(mPrefs.getBoolean("haptic", true));
-			mainView.setFullWidth(mPrefs.getBoolean("large_width", false));
-			mainView.setScaleControls(mPrefs.getBoolean("scale_buttons", false));
-			mainView.setKeybLite(mPrefs.getBoolean("keybLite", false));
-			mainView.setSound(mPrefs.getBoolean("sound", false));
-		}
 		if (mPrefs.getBoolean("fullScreen", false)) {
 			getWindow().addFlags(LayoutParams.FLAG_FULLSCREEN);
 			getWindow().clearFlags(LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
@@ -159,7 +150,16 @@ public class X48 extends Activity {
     		getWindow().addFlags(LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 			getWindow().clearFlags(LayoutParams.FLAG_FULLSCREEN);
 		}
-		mainView.requestLayout();
+		if (mainView != null) {
+			mainView.backBuffer = null;
+    		mainView.needFlip = true;
+			mainView.setHapticFeedbackEnabled(mPrefs.getBoolean("haptic", true));
+			mainView.setFullWidth(mPrefs.getBoolean("large_width", false));
+			mainView.setScaleControls(mPrefs.getBoolean("scale_buttons", false));
+			mainView.setKeybLite(mPrefs.getBoolean("keybLite", false));
+			mainView.setSound(mPrefs.getBoolean("sound", false));
+			mainView.requestLayout();
+		}
     }
         
     public void changeKeybLite() {

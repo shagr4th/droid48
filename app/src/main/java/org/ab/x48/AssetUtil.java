@@ -15,7 +15,7 @@ public class AssetUtil {
 	public static boolean copyAsset(Context context, AssetManager am, boolean force) {
 		File newDir = getSDDir(context);
 		File sd = Environment.getExternalStorageDirectory();
-		if (sd != null && sd.exists() && sd.isDirectory() && newDir.exists() && newDir.isDirectory()) {
+		if (sd != null && sd.exists() && sd.isDirectory() && newDir != null && newDir.exists() && newDir.isDirectory()) {
 			File hpDir = new File(sd, ".hp48");
 			if (hpDir.exists()) {
 				File allFiles [] = hpDir.listFiles();
