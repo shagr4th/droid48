@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -133,10 +134,10 @@ public class X48 extends Activity {
     
     public void checkPrefs() {
     	SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-		/*if (mPrefs.getBoolean("blockOrientation", false))
+		if (mPrefs.getBoolean("blockOrientation", false))
     		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
     	else
-    		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);*/
+    		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     	bitmapSkin = mPrefs.getBoolean("bitmapskin", false);
     	String port1 = mPrefs.getString("port1", "0");
 		managePort(1, port1);
@@ -152,7 +153,7 @@ public class X48 extends Activity {
 		}
 		if (mainView != null) {
 			mainView.backBuffer = null;
-    		mainView.needFlip = true;
+			mainView.needFlip = true;
 			mainView.setHapticFeedbackEnabled(mPrefs.getBoolean("haptic", true));
 			mainView.setFullWidth(mPrefs.getBoolean("large_width", false));
 			mainView.setScaleControls(mPrefs.getBoolean("scale_buttons", false));
