@@ -568,7 +568,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback {
 	            	        
 	            			
 	            			Log.i("x48", "init backBuffer !: " + keybLite);
-	            			backBuffer = Bitmap.createBitmap(c.getWidth(), c.getHeight(), Bitmap.Config.ARGB_8888);
+	            			backBuffer = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
 	            			Canvas backCanvas = new Canvas(backBuffer);
 	            			
 	            			int w = backBuffer.getWidth();
