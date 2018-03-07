@@ -32,5 +32,6 @@ app/app.iml
 ehthumbs.db
 Thumbs.db
 
+app/.externalNativeBuild
 
 app/app-all-release.apk

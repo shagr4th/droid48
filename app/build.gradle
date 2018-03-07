@@ -1,29 +1,35 @@
-apply plugin: 'com.android.model.application'
-model {
-    android {
-        compileSdkVersion 24
-        buildToolsVersion "25.0.2"
+apply plugin: 'com.android.application'
+android {
+    compileSdkVersion 24
+    buildToolsVersion "27.0.3"
 
-        defaultConfig {
-            applicationId "org.ab.x48"
-            minSdkVersion.apiLevel 9
-            targetSdkVersion.apiLevel 24
-        }
+    defaultConfig {
+        applicationId "org.ab.x48"
+        minSdkVersion 16
+        targetSdkVersion 24
 
-        ndk {
-            moduleName "droid48"
-            ldLibs.addAll(["android", "log"])
-            platformVersion = "9"
-        }
-
-        productFlavors {
-            create("all") {
-                // If ndk.abiFilters is not configured, the application
-                // compile and package all suppported ABI.
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_PLATFORM=android-16"
             }
         }
     }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/jni/CMakeLists.txt"
+        }
+    }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi', 'mips', 'x86'
+        }
+    }
+
 }
 dependencies {
-    compile 'com.getkeepsafe.relinker:relinker:1.2.2'
+    compile 'com.getkeepsafe.relinker:relinker:1.2.3'
 }
