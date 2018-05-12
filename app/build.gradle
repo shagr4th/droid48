@@ -21,15 +21,7 @@ android {
         }
     }
 
-    splits {
-        abi {
-            enable true
-            reset()
-            include 'armeabi', 'mips', 'x86'
-        }
-    }
-
 }
 dependencies {
-    compile 'com.getkeepsafe.relinker:relinker:1.2.3'
+    implementation 'com.getkeepsafe.relinker:relinker:1.2.3'
 }
