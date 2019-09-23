@@ -33,5 +33,6 @@ ehthumbs.db
 Thumbs.db
 
 app/.externalNativeBuild
+app/.cxx
 
 app/app-all-release.apk

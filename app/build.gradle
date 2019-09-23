@@ -1,12 +1,23 @@
 apply plugin: 'com.android.application'
 android {
-    compileSdkVersion 25
-    buildToolsVersion "28.0.1"
+    signingConfigs {
+        release {
+            def Properties localProps = new Properties()
+            localProps.load(new FileInputStream(file('../local.properties')))
+            assert localProps['droid48.store'];
+            storeFile file(localProps["droid48.store"])
+            keyAlias localProps["droid48.alias"]
+            storePassword localProps["droid48.storePass"]
+            keyPassword localProps["droid48.pass"]
+        }
+    }
+    compileSdkVersion 26
+    buildToolsVersion "29.0.2"
 
     defaultConfig {
         applicationId "org.ab.x48"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 26
 
         externalNativeBuild {
             cmake {
@@ -23,5 +34,5 @@ android {
 
 }
 dependencies {
-    implementation 'com.getkeepsafe.relinker:relinker:1.2.3'
+    implementation 'com.getkeepsafe.relinker:relinker:1.3.1'
 }
