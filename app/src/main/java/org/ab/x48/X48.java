@@ -407,6 +407,7 @@ public class X48 extends Activity {
    						boolean msgbox = mPrefs.getBoolean("no_loadprog_msgbox", false);
    						if (!msgbox)
    							showDialog(DIALOG_PROG_OK);
+   						pressOnKey();
    					} else {
    						showDialog(DIALOG_PROG_KO);
    					}
@@ -423,7 +424,16 @@ public class X48 extends Activity {
    		}
    	}
    }
-   
+
+   private void pressOnKey() {
+       // When a file is loaded, the loaded object is not shown on
+       // the stack. Pressing the 'ON' key will refresh the screen
+       // and the just-loaded object will be shown on the stack.
+       int ON_KEY_CODE = 44;
+       mainView.key(ON_KEY_CODE, true);
+       mainView.key(ON_KEY_CODE, false);
+   }
+
    private boolean saveonExit;
    private boolean hp48s;
    private boolean bitmapSkin = false;
