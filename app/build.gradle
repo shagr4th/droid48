@@ -12,7 +12,7 @@ android {
         }
     }
     compileSdkVersion 26
-    buildToolsVersion "29.0.2"
+    buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "org.ab.x48"
@@ -34,5 +34,5 @@ android {
 
 }
 dependencies {
-    implementation 'com.getkeepsafe.relinker:relinker:1.3.1'
+    implementation 'com.getkeepsafe.relinker:relinker:1.4.1'
 }
