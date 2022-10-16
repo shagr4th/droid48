@@ -32,6 +32,14 @@ android {
         }
     }
 
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
 }
 dependencies {
     implementation 'com.getkeepsafe.relinker:relinker:1.4.5'
