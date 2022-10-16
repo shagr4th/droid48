@@ -36,3 +36,8 @@ app/.externalNativeBuild
 app/.cxx
 
 app/app-all-release.apk
+
+#using VSCode now
+org.eclipse.buildship.core.prefs
+.project
+.classpath

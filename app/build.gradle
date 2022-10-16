@@ -11,13 +11,13 @@ android {
             keyPassword localProps["droid48.pass"]
         }
     }
-    compileSdkVersion 29
-    ndkVersion "22.1.7171670"
+    compileSdkVersion 31
+    ndkVersion "25.1.8937393"
 
     defaultConfig {
         applicationId "org.ab.x48"
         minSdkVersion 16
-        targetSdkVersion 29
+        targetSdkVersion 31
 
         externalNativeBuild {
             cmake {
@@ -34,5 +34,5 @@ android {
 
 }
 dependencies {
-    implementation 'com.getkeepsafe.relinker:relinker:1.4.3'
+    implementation 'com.getkeepsafe.relinker:relinker:1.4.5'
 }

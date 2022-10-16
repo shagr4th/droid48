@@ -380,10 +380,10 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback {
 							boolean antialias = true;
             				
 							systemOptionsPaint = new Paint();
-            				systemOptionsPaint.setTypeface(regularBold);
-            				systemOptionsPaint.setAntiAlias(antialias);
-            				systemOptionsPaint.setTextSize((int) (12f * scale));
-            				systemOptionsPaint.setColor(Color.BLACK);
+							systemOptionsPaint.setTypeface(regularBold);
+							systemOptionsPaint.setAntiAlias(antialias);
+							systemOptionsPaint.setTextSize((int) (12f * scale));
+							systemOptionsPaint.setColor(Color.BLACK);
             				
 							if (x48.isBitmapSkin()) {
 	            				BitmapFactory.Options opts = new BitmapFactory.Options();

@@ -134,7 +134,7 @@ public class X48 extends Activity {
     
     public void checkPrefs() {
     	SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-		if (mPrefs.getBoolean("blockOrientation", false))
+    	if (mPrefs.getBoolean("blockOrientation", false))
     		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
     	else
     		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
