@@ -34,6 +34,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 public class HPView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -42,6 +43,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback {
 	private Bitmap mainScreen;
 	private SurfaceHolder mSurfaceHolder;
 	private boolean surfaceValid;
+	private int visibility = VISIBLE;
 	private Bitmap  annImages [];
     private Bitmap  menuIcon;
 	boolean ann [];
@@ -946,6 +948,12 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	@Override
+	protected void onVisibilityChanged(View changedView, int visibility) {
+		super.onVisibilityChanged(changedView, visibility);
+		this.visibility = visibility;
+	}
+
+	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		synchronized (mSurfaceHolder) {
 			float x, y;
@@ -1072,7 +1080,9 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback {
 		else
 			currentOrientation = Configuration.ORIENTATION_LANDSCAPE;
 		//initGraphicsElements();
-		backBuffer = null;
+		synchronized (mSurfaceHolder) {
+			backBuffer = null;
+		}
 		x48.flipScreen();
 	}
 	
@@ -1116,7 +1126,7 @@ public class HPView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public void refresh() {
-		if (surfaceValid) {
+		if (surfaceValid && visibility == VISIBLE) {
 			if (needFlip || x48.fillScreenData(buf, ann) == 1) {
 				needFlip = false;
 				refreshMainScreen(buf);
