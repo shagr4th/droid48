@@ -506,9 +506,11 @@ private void managePort(int number, String value) {
 	protected void onDestroy() {
 		Log.i("x48", "onDestroy");
 		super.onDestroy();
-		if (saveonExit)
+		if (saveonExit) {
+			Log.i("x48", "saveState");
 			saveState();
-		stopHPEmulator();
+		}
+		thread.exit();
 		if (need_to_quit)
 			System.exit(0);
 	}
