@@ -70,7 +70,8 @@
 #include <sys/time.h>
 #include <fcntl.h>
 
-#include "x48.h"
+#include "binio.h"
+#include "hp48_emu.h"
 #include "hp48.h"
 #include "debugger.h"
 

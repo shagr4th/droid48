@@ -178,3 +178,17 @@ extern void XClearWindow __ProtoType__((Display *dpy, Window win));
 
 static pthread_cond_t  uiConditionVariable  = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t uiConditionMutex     = PTHREAD_MUTEX_INITIALIZER;
+
+extern int
+#ifdef __FunctionProto__
+button_pressed(int b);
+#else
+button_pressed(b);
+#endif
+
+extern int
+#ifdef __FunctionProto__
+button_released(int b);
+#else
+button_released(b);
+#endif
