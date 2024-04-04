@@ -15,6 +15,7 @@
 #
 
 cmake_minimum_required(VERSION 3.10.2)
+project("droid48")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=format-security")
 
