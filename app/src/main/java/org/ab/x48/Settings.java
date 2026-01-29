@@ -53,12 +53,16 @@ public class Settings extends PreferenceActivity {
 	        savePref.setSummary(R.string.saveonexit_msgbox_value);
 	        inlinePrefCat.addPreference(savePref);
 
+			// -- THE JAVA LISTENER (comente estas lineas)
+			/*
 		 	CheckBoxPreference blockOrientation = new CheckBoxPreference(this);
 	        blockOrientation.setKey("blockOrientation");
 	        blockOrientation.setTitle(R.string.blockorientation_msgbox);
 	        blockOrientation.setSummary(R.string.blockorientation_msgboxvalue);
 	        inlinePrefCat.addPreference(blockOrientation);
-	        
+	        */
+   		 	// -- /THE JAVA LISTENER
+
 	        CheckBoxPreference keybLitePref = new CheckBoxPreference(this);
 	        keybLitePref.setKey("keybLite");
 	        keybLitePref.setTitle(R.string.show_lite_keyb);
